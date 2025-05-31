@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // Import login.dart di sini
+//import 'login.dart'; // Import login.dart di sini
+import 'layanan.dart'; // Import layanan.dart di sini
 
 void main() {
   runApp(const MainApp());
@@ -11,7 +12,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: LoginPage(), // Set LoginPage sebagai home page
+      home: LayananPage(), // Set LayananPage sebagai home page
     );
   }
 }
