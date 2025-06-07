@@ -1,4 +1,4 @@
-import 'package:aplikasi_kasir/screens/pembayaran_page.dart';
+import 'pembayaran_page.dart';
 import 'package:flutter/material.dart';
 
 class PesananMasukPage extends StatefulWidget {
