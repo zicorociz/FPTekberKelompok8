@@ -19,6 +19,7 @@ class _PetugasPageState extends State<PetugasPage> {
       'shift': 'Pagi',
       'jamKerja': '08:00 - 16:00',
       'foto': 'https://i.pravatar.cc/300?img=1',
+      'isActive': false,
     },
     {
       'id': 2,
@@ -28,6 +29,7 @@ class _PetugasPageState extends State<PetugasPage> {
       'shift': 'Malam',
       'jamKerja': '16:00 - 00:00',
       'foto': 'https://i.pravatar.cc/300?img=5',
+      'isActive': false,
     },
     {
       'id': 3,
@@ -37,6 +39,7 @@ class _PetugasPageState extends State<PetugasPage> {
       'shift': 'Malam',
       'jamKerja': '16:00 - 00:00',
       'foto': 'https://i.pravatar.cc/300?img=45',
+      'isActive': false,
     },
     {
       'id': 4,
@@ -46,6 +49,7 @@ class _PetugasPageState extends State<PetugasPage> {
       'shift': 'Pagi',
       'jamKerja': '08:00 - 16:00',
       'foto': 'https://i.pravatar.cc/300?img=44',
+      'isActive': false,
     },
   ];
 
@@ -148,6 +152,32 @@ class _PetugasPageState extends State<PetugasPage> {
                             ],
                           ),
 
+                          // Menampilkan Status Aktif/Tidak Aktif
+                          Row(
+                            children: [
+                              Icon(
+                                petugas[index]['isActive']
+                                    ? Icons.check_circle
+                                    : Icons.remove_circle,
+                                color: petugas[index]['isActive']
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                petugas[index]['isActive']
+                                    ? 'Aktif'
+                                    : 'Tidak Aktif',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: petugas[index]['isActive']
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+
                           // Detail Informasi
                           _buildInfoRow('👤', petugas[index]['username']),
                           _buildInfoRow('📧', petugas[index]['email']),
@@ -157,6 +187,17 @@ class _PetugasPageState extends State<PetugasPage> {
                           ),
                         ],
                       ),
+                    ),
+                    // Switch untuk mengubah status petugas
+                    Switch(
+                      value: petugas[index]['isActive'],
+                      onChanged: (bool value) {
+                        setState(() {
+                          petugas[index]['isActive'] = value;
+                        });
+                      },
+                      activeColor: Colors.green,
+                      inactiveThumbColor: Colors.red,
                     ),
                   ],
                 ),
