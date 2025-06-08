@@ -12,6 +12,9 @@ const String backgroundImagePath =
 const Color coffeeGreen = Colors.green;
 
 class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
+  String newCategory = 'bahan baku';
+  bool isDropdownOpened =
+      false; // Variabel untuk mendeteksi apakah dropdown dibuka atau tidak
   List<Map<String, dynamic>> items = [
     {
       'name': 'Macchiato',
@@ -309,7 +312,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       context: context,
       builder: (BuildContext context) {
         String newName = '';
-        String newCategory = '';
+        String newCategory = 'bahan baku'; // Set default category
         double newPrice = 0;
         int newStock = 0;
 
@@ -317,7 +320,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           backgroundColor: Colors.brown[800],
           title: const Text(
             'Tambah Barang Baru',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -331,13 +334,38 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                   style: TextStyle(color: Colors.white),
                   onChanged: (value) => newName = value,
                 ),
-                TextField(
+                // Dropdown untuk kategori
+                DropdownButtonFormField<String>(
+                  value: newCategory,
                   decoration: InputDecoration(
                     labelText: 'Kategori',
                     labelStyle: TextStyle(color: Colors.white70),
                   ),
+                  dropdownColor: Colors.brown[500],
+                  items:
+                      [
+                            'bahan baku',
+                            'makanan',
+                            'minuman',
+                            'bubuk kopi',
+                          ] // Daftar kategori
+                          .map((String category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: Text(
+                                category,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          })
+                          .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      newCategory =
+                          value ?? 'bahan baku'; // Mengupdate kategori
+                    });
+                  },
                   style: TextStyle(color: Colors.white),
-                  onChanged: (value) => newCategory = value,
                 ),
                 TextField(
                   decoration: InputDecoration(
@@ -412,7 +440,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           backgroundColor: Colors.brown[800],
           title: Text(
             'Edit ${item['name']}',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -426,13 +454,38 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                   ),
                   style: TextStyle(color: Colors.white),
                 ),
-                TextField(
-                  controller: categoryController,
+                // Dropdown untuk kategori
+                DropdownButtonFormField<String>(
+                  value: item['category'], // Mengambil kategori yang sudah ada
                   decoration: InputDecoration(
                     labelText: 'Kategori',
                     labelStyle: TextStyle(color: Colors.white70),
                   ),
-                  style: TextStyle(color: Colors.white),
+                  dropdownColor: Colors.brown[500],
+                  items:
+                      [
+                            'bahan baku',
+                            'makanan',
+                            'minuman',
+                            'bubuk kopi',
+                          ] // Daftar kategori
+                          .map((String category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: Text(
+                                category,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          })
+                          .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      item['category'] =
+                          value ?? 'bahan baku'; // Mengupdate kategori
+                    });
+                  },
+                  style: TextStyle(color: Colors.black),
                 ),
                 TextField(
                   controller: priceController,
