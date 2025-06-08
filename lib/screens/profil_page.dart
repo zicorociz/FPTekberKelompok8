@@ -6,7 +6,7 @@ class ProfilPage extends StatefulWidget {
 }
 
 const String backgroundImagePath =
-    'assets/images/background.png';
+    'https://images.unsplash.com/photo-1650292386081-fed5cb55d588?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 const Color coffeeGreen = Colors.green;
 
 class _ProfilPageState extends State<ProfilPage> {
@@ -108,6 +108,16 @@ class _ProfilPageState extends State<ProfilPage> {
                     ElevatedButton(
                       onPressed: _editProfil,
                       child: Text('Edit Profil'),
+                    ),
+                    SizedBox(height: 12), // beri jarak
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Warna merah untuk logout
+                      ),
+                      child: Text('Sign Out'),
                     ),
                   ],
                 ),
