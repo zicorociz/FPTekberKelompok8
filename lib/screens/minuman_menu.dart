@@ -1,6 +1,7 @@
 import 'dart:typed_data'; // Untuk Uint8List
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'add_menu_page.dart';
 
 class MinumanMenuPage extends StatefulWidget {
   @override
@@ -298,11 +299,27 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: const Color(0xFF6B4226),
+      //   shape: const CircleBorder(),
+      //   child: const Icon(Icons.add, color: Colors.white, size: 30),
+      //   onPressed: _showAddMenuItemDialog,
+      // ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF6B4226),
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white, size: 30),
-        onPressed: _showAddMenuItemDialog,
+        onPressed: () async {
+          final result = await Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AddMenuPage()),
+          );
+
+          if (result != null && result is Map<String, dynamic>) {
+            setState(() {
+              _menuItems.add(result);
+            });
+          }
+        },
       ),
       body: Container(
         decoration: BoxDecoration(
