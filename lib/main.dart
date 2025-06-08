@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Aplikasi Admin',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
         primarySwatch: Colors.brown,
@@ -31,7 +33,11 @@ class MyApp extends StatelessWidget {
           unselectedItemColor: Colors.grey[400],
         ),
       ),
-      home: HomeScreen(),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => LoginPage(),
+        '/home': (context) => HomeScreen(),
+      },
     );
   }
 }
