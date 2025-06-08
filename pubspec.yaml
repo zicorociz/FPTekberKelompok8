@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -17,10 +18,20 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins/Poppins-Italic.ttf
+          style: italic
   assets:
-    - assets/images/sikilap.png
-    - assets/images/car_wash_image.jpg
-    - assets/images/home_service_icon.png
-    - assets/images/wireless_icon.png
-    - assets/images/home_blue.png
-    - assets/images/Icon_blue.png
+    - assets/images/lemon_squash.jpg
+    - assets/images/matcha_latte.jpg
+    - assets/images/mango.jpg
+    - assets/images/espresso.jpg
+    - assets/images/caramel_macchiato.jpg
+    - assets/images/background.png

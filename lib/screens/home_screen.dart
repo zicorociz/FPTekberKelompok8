@@ -3,6 +3,7 @@ import 'petugas_page.dart';
 import 'profil_page.dart';
 import 'pesanan_masuk_page.dart';
 import 'warehouse_menu_page.dart';
+import 'minuman_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 const String backgroundImagePath =
-    'https://images.unsplash.com/photo-1650292386081-fed5cb55d588?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    'assets/images/background.png';
 const Color coffeeGreen = Colors.green;
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ProfilPage(),
     PesananMasukPage(),
     WarehouseMenuPage(),
+    MinumanMenuPage(),
   ];
 
   @override
@@ -46,6 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
           BottomNavigationBarItem(icon: Icon(Icons.notes), label: 'Pesanan'),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Warehouse'),
+          BottomNavigationBarItem( // Tambahkan item menu makanan
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Makanan',
+          )
         ],
       ),
     );

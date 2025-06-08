@@ -4,7 +4,7 @@ import 'screens/home_screen.dart';
 void main() => runApp(MyApp());
 
 const String backgroundImagePath =
-    'https://images.unsplash.com/photo-1650292386081-fed5cb55d588?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    'assets/images/background.png';
 
 class MyApp extends StatelessWidget {
   @override
@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Aplikasi Admin',
       theme: ThemeData(
+        fontFamily: 'Poppins',
         primarySwatch: Colors.brown,
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.brown[900],
