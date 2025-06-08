@@ -17,21 +17,21 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       false; // Variabel untuk mendeteksi apakah dropdown dibuka atau tidak
   List<Map<String, dynamic>> items = [
     {
-      'name': 'Macchiato',
-      'category': 'minuman',
+      'name': 'Bubuk Kopi Arabika',
+      'category': 'bubuk kopi',
       'price': 20000.00,
       'stock': 71,
       'image': 'https://i.imgur.com/Jc1mR5X.png',
     },
     {
-      'name': 'Greek Omelet',
-      'category': 'makanan',
+      'name': 'Tepung Terigu',
+      'category': 'bahan baku',
       'price': 20000.00,
       'stock': 83,
       'image': 'https://i.imgur.com/Jc1mR5X.png',
     },
     {
-      'name': 'Lemon Squash',
+      'name': 'Kopi Susu bubuk',
       'category': 'minuman',
       'price': 15000.00,
       'stock': 92,
