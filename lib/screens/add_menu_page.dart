@@ -18,7 +18,9 @@ class _AddMenuPageState extends State<AddMenuPage> {
   final ImagePicker _picker = ImagePicker();
 
   void _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() {
@@ -31,9 +33,9 @@ class _AddMenuPageState extends State<AddMenuPage> {
     if (_nameController.text.isEmpty ||
         _priceController.text.isEmpty ||
         _descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harap isi semua kolom.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Harap isi semua kolom.')));
       return;
     }
 
@@ -74,9 +76,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
           ),
 
           // Optional: semi-transparent overlay supaya konten lebih terbaca
-          Container(
-            color: Colors.white.withOpacity(0.8),
-          ),
+          Container(color: Colors.white.withOpacity(0.8)),
 
           // Konten utama
           SingleChildScrollView(
@@ -84,7 +84,9 @@ class _AddMenuPageState extends State<AddMenuPage> {
             child: Card(
               color: const Color.fromRGBO(226, 224, 213, 1),
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -97,7 +99,11 @@ class _AddMenuPageState extends State<AddMenuPage> {
                       keyboardType: TextInputType.text,
                     ),
                     const SizedBox(height: 16),
-                    _buildTextField(_descriptionController, 'Deskripsi', maxLines: 4),
+                    _buildTextField(
+                      _descriptionController,
+                      'Deskripsi',
+                      maxLines: 4,
+                    ),
                     const SizedBox(height: 20),
 
                     if (_selectedImageBytes != null)
@@ -113,21 +119,32 @@ class _AddMenuPageState extends State<AddMenuPage> {
                     else
                       const Text(
                         'Belum ada gambar dipilih',
-                        style: TextStyle(fontStyle: FontStyle.italic, fontFamily: 'Poppins'),
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontFamily: 'Poppins',
+                        ),
                       ),
                     const SizedBox(height: 12),
 
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accentColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: _pickImage,
                       icon: const Icon(Icons.upload_file, color: Colors.white),
                       label: const Text(
                         'Upload Gambar',
-                        style: TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Poppins',
+                        ),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -138,13 +155,18 @@ class _AddMenuPageState extends State<AddMenuPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: themeColor,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                         ),
                         onPressed: _saveMenu,
                         child: const Text(
                           'Simpan Menu',
                           style: TextStyle(
-                              fontSize: 16, fontFamily: 'Poppins', fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),

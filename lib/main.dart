@@ -4,8 +4,7 @@ import 'screens/login_page.dart';
 
 void main() => runApp(MyApp());
 
-const String backgroundImagePath =
-    'assets/images/background.png';
+const String backgroundImagePath = 'assets/images/background.png';
 
 class MyApp extends StatelessWidget {
   @override
