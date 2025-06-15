@@ -10,18 +10,17 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-const String backgroundImagePath =
-    'assets/images/background.png';
+const String backgroundImagePath = 'assets/images/background.png';
 const Color coffeeGreen = Colors.green;
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
-    PetugasPage(),
-    ProfilPage(),
     PesananMasukPage(),
-    WarehouseMenuPage(),
     MinumanMenuPage(),
+    PetugasPage(),
+    WarehouseMenuPage(),
+    ProfilPage(),
   ];
 
   @override
@@ -41,17 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
         items: [
+          BottomNavigationBarItem(icon: Icon(Icons.notes), label: 'Pesanan'),
           BottomNavigationBarItem(
+            // Tambahkan item menu makanan
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Makanan',
+          ),
+          BottomNavigationBarItem(
+            // Mengelola Shift Pegawai
             icon: Icon(Icons.admin_panel_settings),
             label: 'Petugas',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-          BottomNavigationBarItem(icon: Icon(Icons.notes), label: 'Pesanan'),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Warehouse'),
-          BottomNavigationBarItem( // Tambahkan item menu makanan
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Makanan',
-          )
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );

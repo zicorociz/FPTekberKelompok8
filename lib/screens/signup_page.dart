@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 
-const String backgroundImagePath =
-    'assets/images/background.png';
+const String backgroundImagePath = 'assets/images/background.png';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -13,13 +12,47 @@ class _SignUpPageState extends State<SignUpPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   void _signUp() {
-    // Tambahkan logika penyimpanan akun (misalnya ke backend atau lokal)
-    // Di sini hanya pindah ke login dulu
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => LoginPage()),
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    final emailValid = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(email);
+
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      _showError('Semua field wajib diisi.');
+    } else if (!emailValid) {
+      _showError('Format email tidak valid.');
+    } else if (password.length < 8) {
+      _showError('Password minimal 8 karakter.');
+    } else if (password != confirmPassword) {
+      _showError('Password dan Ulangi Password tidak cocok.');
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LoginPage()),
+      );
+    }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Sign Up Gagal'),
+        content: Text(message),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('OK')),
+        ],
+      ),
     );
   }
 
@@ -45,7 +78,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 32,
+                  horizontal: 24,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -87,11 +123,27 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Ulangi Password',
+                        labelStyle: TextStyle(color: Colors.white),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white54),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _signUp,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
                         child: Text('Sign Up'),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -99,14 +151,27 @@ class _SignUpPageState extends State<SignUpPage> {
                         shape: StadiumBorder(),
                       ),
                     ),
+                    SizedBox(height: 16),
                     TextButton(
                       onPressed: () => Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (_) => LoginPage()),
                       ),
-                      child: Text(
-                        'Sudah punya akun? Login',
-                        style: TextStyle(color: Colors.white70),
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.white70),
+                          children: [
+                            TextSpan(text: 'Sudah punya akun? '),
+                            TextSpan(
+                              text: 'Login',
+                              style: TextStyle(
+                                color: Colors.white,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

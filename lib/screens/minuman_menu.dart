@@ -226,9 +226,8 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
         // Properti 'bottom' (untuk TabBar) sudah dihapus
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF6B4226),
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: Colors.white, size: 30),
+        backgroundColor: Colors.brown[900],
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () async {
           final result = await Navigator.of(
             context,

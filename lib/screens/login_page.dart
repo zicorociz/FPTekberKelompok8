@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'signup_page.dart';
 
-const String backgroundImagePath =
-    'assets/images/background.png';
+const String backgroundImagePath = 'assets/images/background.png';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,10 +14,37 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   void _signIn() {
-    // Validasi login bisa ditambahkan di sini
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => HomeScreen()),
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    final emailValid = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(email);
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError('Email dan password wajib diisi.');
+    } else if (!emailValid) {
+      _showError('Format email tidak valid.');
+    } else if (password.length < 8) {
+      _showError('Password tidak boleh kurang dari 8 karakter.');
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+      );
+    }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Login Gagal'),
+        content: Text(message),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('OK')),
+        ],
+      ),
     );
   }
 
@@ -95,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 16),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => SignUpPage()),
                         );
