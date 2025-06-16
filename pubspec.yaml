@@ -10,8 +10,12 @@ dependencies:
   flutter:
     sdk: flutter
   image_picker: ^1.1.2
-  # supabase_flutter: ^2.9.1
   intl: ^0.18.1
+  firebase_core: ^2.18.0
+  flutter_bloc: ^8.1.1
+  hydrated_bloc: ^9.0.0
+  path_provider: ^2.0.14
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:

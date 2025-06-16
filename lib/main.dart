@@ -1,16 +1,29 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_page.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
-
-const supabaseUrl = 'https://jmnqcyxvjsutbnddabue.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbnFjeXh2anN1dGJuZGRhYnVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5Njg5MzEsImV4cCI6MjA2NTU0NDkzMX0.hsHx-3n6RKRhuv-VHJiyRc5aUWgrazr5M3aMrDjr9vk';
-
-
-// void main() => runApp(MyApp());
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // --- Tambahkan ini untuk verifikasi ---
+    print('Firebase berhasil diinisialisasi!');
+    // Opsional: Anda bisa memeriksa app default
+    if (Firebase.apps.isNotEmpty) {
+      print('Aplikasi Firebase default: ${Firebase.app().name}');
+    }
+
+  } catch (e) {
+    // --- Tambahkan ini untuk menangkap error inisialisasi ---
+    print('Error inisialisasi Firebase: $e');
+  }
+// await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+// );
   runApp(const MyApp());
 }
 

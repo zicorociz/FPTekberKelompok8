@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "196532977484",
+    "project_id": "fptekberkel8",
+    "storage_bucket": "fptekberkel8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196532977484:android:6314f25b844d1843c199e9",
+        "android_client_info": {
+          "package_name": "com.example.fptekberkel8"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALhO8hFn639ug47OELwcVqIlBSuk-wkcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
