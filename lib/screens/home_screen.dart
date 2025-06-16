@@ -33,16 +33,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // dengan data _confirmedOrders yang paling baru setiap kali setState dipanggil.
   List<Widget> get _screens {
     return [
-      // 1. PesananMasukPage: Menerima daftar pesanan saat ini
       PesananMasukPage(
-        // Gunakan ValueKey agar Flutter tahu kapan harus membangun ulang widget
-        // Ini membantu memastikan didUpdateWidget di PesananMasukPage terpicu
         key: ValueKey('PesananMasukPage-${_confirmedOrders.length}'),
         currentOrders: _confirmedOrders, // Teruskan daftar pesanan ke PesananMasukPage
       ),
-      // 2. MinumanMenuPage: Menerima fungsi callback untuk menambahkan pesanan baru
       MinumanMenuPage(onOrderConfirmed: _addConfirmedOrder), // Teruskan callback
-      // 3. Halaman-halaman lain tanpa perubahan data yang kompleks
       PetugasPage(),
       WarehouseMenuPage(),
       ProfilPage(),

@@ -1,11 +1,15 @@
+// petugas_page.dart
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Untuk Firebase Firestore
-import 'package:firebase_auth/firebase_auth.dart'; // Untuk Firebase Authentication
-
-
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:firebase_auth/firebase_auth.dart'; 
+import 'dart:io'; 
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb; 
+import 'package:firebase_storage/firebase_storage.dart'; 
+import 'package:image_picker/image_picker.dart'; 
 
 const String backgroundImagePath =
-    'assets/images/background.png'; // Ganti dengan path lokal jika menggunakan aset lokal
+    'assets/images/background.png'; 
 
 class PetugasPage extends StatefulWidget {
   @override
@@ -14,7 +18,7 @@ class PetugasPage extends StatefulWidget {
 
 class _PetugasPageState extends State<PetugasPage> {
   // Stream untuk mendengarkan perubahan data dari Firestore secara real-time
-  Stream<QuerySnapshot>? _pegawaiStream; // Diubah namanya menjadi _pegawaiStream
+  Stream<QuerySnapshot>? _pegawaiStream;
   String? _userId; // ID pengguna yang terautentikasi (digunakan hanya untuk proses autentikasi Firebase)
   final FirebaseAuth _auth = FirebaseAuth.instance; // Instance Firebase Auth
 
@@ -26,6 +30,10 @@ class _PetugasPageState extends State<PetugasPage> {
   final TextEditingController _jamKerjaController = TextEditingController();
 
   bool _newPegawaiIsActive = false; // Status default untuk pegawai baru
+  XFile? _selectedXFile; // File gambar yang dipilih oleh image_picker
+  Uint8List? _selectedImageBytes; // Bytes gambar untuk pratinjau di web
+  final ImagePicker _picker = ImagePicker(); // Instance ImagePicker
+  bool _isUploading = false; // Status untuk menunjukkan apakah unggahan sedang berlangsung
 
   @override
   void initState() {
@@ -50,23 +58,18 @@ class _PetugasPageState extends State<PetugasPage> {
     // Dapatkan APP ID dari environment Canvas
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
 
-    // Mendengarkan perubahan status autentikasi pengguna
     _auth.authStateChanges().listen((User? user) {
-      if (mounted) { // Pastikan widget masih ada sebelum memanggil setState
+      if (mounted) { 
         setState(() {
-          _userId = user?.uid ?? 'anonymous_user'; // Set ID pengguna (digunakan oleh Firebase Auth)
+          _userId = user?.uid ?? 'anonymous_user'; 
           print("ID Pengguna Saat Ini: $_userId");
 
-          // Atur stream Firestore setelah ID pengguna tersedia.
-          // Jalur koleksi disesuaikan dengan skema penyimpanan data di Canvas.
           _pegawaiStream = FirebaseFirestore.instance
               .collection('artifacts')
               .doc(appId)
-              .collection('public') // Gunakan 'public' untuk data yang bisa diakses multi-user
+              .collection('public') 
               .doc('data')
-              .collection('pegawai') // Nama koleksi diubah menjadi 'pegawai'
-              // --- PERUBAHAN: Mengurutkan berdasarkan 'id' secara ascending (menaik) ---
-              // Ini akan menempatkan pegawai baru (dengan ID lebih besar) di bagian bawah daftar.
+              .collection('pegawai') 
               .orderBy('id', descending: false)
               .snapshots();
         });
@@ -74,31 +77,82 @@ class _PetugasPageState extends State<PetugasPage> {
     });
   }
 
+  // Fungsi untuk memilih gambar dari galeri perangkat dan memperbarui pratinjau
+  Future<void> _pickImageAndSetStateForPreview() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        _selectedXFile = pickedFile;
+        // Untuk web, baca bytes langsung untuk pratinjau. Untuk non-web, cukup path.
+        if (kIsWeb) {
+          _selectedImageBytes = await pickedFile.readAsBytes();
+        } else {
+          _selectedImageBytes = null;
+        }
+        setState(() {}); // Perbarui UI setelah gambar dipilih/bytes dibaca
+      }
+    } catch (e) {
+      print("Error memilih gambar: $e");
+      _showMessage('Gagal memilih gambar.');
+    }
+  }
+
+  // Fungsi untuk mengunggah gambar ke Firebase Storage
+  // Mengembalikan Download URL gambar yang diunggah
+  Future<String?> _uploadImageToFirebaseStorage(XFile? imageXFile) async {
+    if (imageXFile == null) return null;
+
+    try {
+      final String fileName = 'pegawai_photo_${DateTime.now().millisecondsSinceEpoch}_${imageXFile.name}';
+      final storageRef = FirebaseStorage.instance.ref().child('pegawai_photos').child(fileName);
+
+      print('Memulai unggah foto ke Firebase Storage...');
+      UploadTask uploadTask;
+
+      if (kIsWeb) {
+        final Uint8List bytes = await imageXFile.readAsBytes();
+        uploadTask = storageRef.putData(bytes);
+      } else {
+        final File file = File(imageXFile.path);
+        uploadTask = storageRef.putFile(file);
+      }
+      
+      // Pantau status unggahan
+      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+        print('Upload progress: ${ (progress * 100).toStringAsFixed(2) }%');
+      });
+
+      final TaskSnapshot snapshot = await uploadTask.whenComplete(() {});
+      print('Foto berhasil diunggah!');
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print("Error mengunggah gambar ke Firebase Storage: $e");
+      throw Exception('Gagal mengunggah foto.');
+    }
+  }
+
   // Fungsi untuk menambahkan pegawai baru ke Firestore
   Future<void> _addPegawai() async {
-    // Ambil nilai dari controllers
     final String nama = _namaController.text.trim();
     final String username = _usernameController.text.trim();
     final String email = _emailController.text.trim();
     final String shift = _shiftController.text.trim();
     final String jamKerja = _jamKerjaController.text.trim();
 
-    // Validasi input
     if (nama.isEmpty || username.isEmpty || email.isEmpty || shift.isEmpty || jamKerja.isEmpty) {
       _showMessage('Semua kolom harus diisi!');
       return;
     }
 
+    setState(() {
+      _isUploading = true; // Aktifkan indikator loading
+    });
+
     try {
-      // Dapatkan APP ID untuk jalur koleksi Firestore
       final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
 
-      // Tentukan ID baru secara sederhana (misal: berdasarkan ID terbesar yang ada + 1)
-      // Ini hanya untuk field 'id' di dokumen, bukan Document ID Firestore itu sendiri.
-      // Perhatikan: ini BUKAN metode yang aman untuk aplikasi multi-user tanpa transaksi yang kompleks
-      // karena bisa terjadi race condition jika dua user menambah di saat bersamaan
-      // dan mencoba menghitung 'id' secara bersamaan.
-      // Untuk tujuan demo ini (single user), ini bisa diterima.
       int newId = 0;
       final QuerySnapshot currentDocs = await FirebaseFirestore.instance
           .collection('artifacts')
@@ -122,8 +176,14 @@ class _PetugasPageState extends State<PetugasPage> {
         newId = 1;
       }
 
+      String fotoUrl = 'https://placehold.co/300x300/CCCCCC/000000?text=No+Photo'; // Default placeholder
+
+      // Unggah foto jika ada yang dipilih
+      if (_selectedXFile != null) {
+        fotoUrl = await _uploadImageToFirebaseStorage(_selectedXFile) ?? fotoUrl;
+      }
+
       // Tambahkan data pegawai ke koleksi 'pegawai' di Firestore
-      // Hanya menyertakan field yang diminta
       await FirebaseFirestore.instance
           .collection('artifacts')
           .doc(appId)
@@ -137,7 +197,7 @@ class _PetugasPageState extends State<PetugasPage> {
             'email': email,
             'shift': shift,
             'jamKerja': jamKerja,
-            'foto': 'https://placehold.co/300x300/CCCCCC/000000?text=No+Photo', // Foto placeholder
+            'foto': fotoUrl, // Menggunakan URL foto yang diunggah atau placeholder
             'isActive': _newPegawaiIsActive,
           });
 
@@ -147,6 +207,10 @@ class _PetugasPageState extends State<PetugasPage> {
     } catch (e) {
       print("Error saat menambahkan pegawai: $e");
       _showMessage('Gagal menambahkan pegawai: $e');
+    } finally {
+      setState(() {
+        _isUploading = false; // Nonaktifkan indikator loading
+      });
     }
   }
 
@@ -155,30 +219,30 @@ class _PetugasPageState extends State<PetugasPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Konfirmasi Hapus'), // Judul lebih jelas
-        content: const Text('Anda yakin ingin menghapus data pegawai ini secara permanen?'), // Pesan lebih jelas
+        title: const Text('Konfirmasi Hapus'),
+        content: const Text('Anda yakin ingin menghapus data pegawai ini secara permanen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'), // Teks tombol
+            child: const Text('Batal'),
           ),
-          ElevatedButton( // Menggunakan ElevatedButton untuk penegasan
+          ElevatedButton(
             onPressed: () {
               _deletePegawai(docId, fotoUrl);
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red, // Warna tombol hapus merah
+              backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Hapus'), // Teks tombol
+            child: const Text('Hapus'),
           ),
         ],
       ),
     );
   }
 
-  // Fungsi untuk menghapus pegawai dari Firestore
+  // Fungsi untuk menghapus pegawai dari Firestore dan Storage
   Future<void> _deletePegawai(String docId, String? fotoUrl) async {
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
@@ -190,6 +254,17 @@ class _PetugasPageState extends State<PetugasPage> {
           .collection('pegawai')
           .doc(docId)
           .delete();
+
+      // Menghapus foto dari Firebase Storage jika ada dan berasal dari Storage
+      if (fotoUrl != null && fotoUrl.isNotEmpty && fotoUrl.contains('firebasestorage.googleapis.com')) {
+        try {
+          final storageRef = FirebaseStorage.instance.refFromURL(fotoUrl);
+          await storageRef.delete();
+          print("Foto berhasil dihapus dari Storage!");
+        } catch (e) {
+          print("Peringatan: Gagal menghapus foto dari Storage (mungkin sudah tidak ada atau URL salah): $e");
+        }
+      }
       _showMessage('Pegawai berhasil dihapus!');
     } catch (e) {
       print("Error saat menghapus pegawai: $e");
@@ -222,10 +297,10 @@ class _PetugasPageState extends State<PetugasPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          backgroundColor: Colors.brown[700], // Warna SnackBar yang lebih cocok
-          behavior: SnackBarBehavior.floating, // Efek floating
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), // Sudut membulat
-          margin: const EdgeInsets.all(10), // Margin dari tepi
+          backgroundColor: Colors.brown[700],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(10),
         ),
       );
     }
@@ -240,6 +315,8 @@ class _PetugasPageState extends State<PetugasPage> {
     _jamKerjaController.clear();
     setState(() {
       _newPegawaiIsActive = false;
+      _selectedXFile = null; // Reset file yang dipilih
+      _selectedImageBytes = null; // Reset bytes gambar
     });
   }
 
@@ -253,27 +330,41 @@ class _PetugasPageState extends State<PetugasPage> {
           builder: (context, setStateInternal) {
             return AlertDialog(
               title: const Text('Tambah Pegawai Baru'),
-              backgroundColor: Colors.brown[50], // Latar belakang dialog lebih terang
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), // Sudut lebih membulat
+              backgroundColor: Colors.brown[50],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.brown[100], // Warna avatar lebih cerah
-                      child: Icon(Icons.person, size: 50, color: Colors.brown[600]), // Ikon lebih besar dan sesuai tema
+                    // Area untuk memilih foto
+                    GestureDetector(
+                      onTap: () async {
+                        await _pickImageAndSetStateForPreview();
+                        setStateInternal(() {}); // Perbarui UI dialog setelah memilih gambar
+                      },
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.brown[100],
+                        backgroundImage: _selectedXFile != null
+                            ? (kIsWeb && _selectedImageBytes != null
+                                ? MemoryImage(_selectedImageBytes!)
+                                : FileImage(File(_selectedXFile!.path))) as ImageProvider<Object>?
+                            : null,
+                        child: _selectedXFile == null
+                            ? Icon(Icons.camera_alt, size: 50, color: Colors.brown[600])
+                            : null,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: _namaController,
                       decoration: InputDecoration(
-                        labelText: 'Nama Lengkap', // Label lebih deskriptif
+                        labelText: 'Nama Lengkap',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10), // Sudut input membulat
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         filled: true,
-                        fillColor: Colors.white, // Latar belakang input putih
+                        fillColor: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -337,8 +428,8 @@ class _PetugasPageState extends State<PetugasPage> {
                               _newPegawaiIsActive = value;
                             });
                           },
-                          activeColor: Colors.green[700], // Warna aktif yang lebih gelap
-                          inactiveThumbColor: Colors.red[700], // Warna non-aktif yang lebih gelap
+                          activeColor: Colors.green[700],
+                          inactiveThumbColor: Colors.red[700],
                         ),
                       ],
                     ),
@@ -354,13 +445,22 @@ class _PetugasPageState extends State<PetugasPage> {
                   child: const Text('Batal', style: TextStyle(color: Colors.brown)),
                 ),
                 ElevatedButton(
-                  onPressed: _addPegawai,
+                  onPressed: _isUploading ? null : _addPegawai, // Tombol dinonaktifkan saat mengunggah
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown, // Warna tombol tambah sesuai tema
+                    backgroundColor: Colors.brown,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Tambah'),
+                  child: _isUploading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text('Tambah'),
                 ),
               ],
             );
@@ -382,8 +482,8 @@ class _PetugasPageState extends State<PetugasPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Pegawai'),
-        centerTitle: true, // Judul di tengah
-        elevation: 0, // Tanpa bayangan
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -428,13 +528,13 @@ class _PetugasPageState extends State<PetugasPage> {
               itemBuilder: (context, index) => Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Card(
-                  elevation: 8, // Tambah elevasi untuk efek bayangan
-                  color: Colors.brown[800]?.withOpacity(0.95), // Opasitas sedikit lebih tinggi
+                  elevation: 8,
+                  color: Colors.brown[800]?.withOpacity(0.95),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0), // Padding merata
+                    padding: const EdgeInsets.all(16.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -444,8 +544,8 @@ class _PetugasPageState extends State<PetugasPage> {
                           height: 80,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3), // Border lebih tebal
-                            boxShadow: [ // Tambah bayangan pada avatar
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.3),
                                 spreadRadius: 2,
@@ -472,31 +572,31 @@ class _PetugasPageState extends State<PetugasPage> {
                                     child: Text(
                                       pegawai[index]['nama'],
                                       style: const TextStyle(
-                                        fontSize: 22, // Ukuran font lebih besar
+                                        fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
-                                      maxLines: 1, // Batasi 1 baris
-                                      overflow: TextOverflow.ellipsis, // Tambah elipsis jika terlalu panjang
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   // Tombol hapus pegawai
                                   IconButton(
-                                    iconSize: 30, // Ukuran ikon lebih besar
+                                    iconSize: 30,
                                     icon: Icon(
-                                      Icons.delete_forever, // Ikon hapus yang lebih kuat
-                                      color: Colors.red[400], // Warna merah lebih terang
+                                      Icons.delete_forever,
+                                      color: Colors.red[400],
                                     ),
                                     onPressed: () =>
                                         _confirmDeletePegawai(pegawai[index]['documentId'], pegawai[index]['foto']),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 5), // Spasi kecil
+                              const SizedBox(height: 5),
                               // Tampilkan ID dari data yang disimpan di Firestore
-                              _buildInfoRow('ID', pegawai[index]['id']?.toString() ?? 'N/A', Colors.white70), // Warna teks info
+                              _buildInfoRow('ID', pegawai[index]['id']?.toString() ?? 'N/A', Colors.white70),
 
-                              const SizedBox(height: 10), // Spasi antar blok info
+                              const SizedBox(height: 10),
 
                               // Menampilkan Status Aktif/Tidak Aktif
                               Row(
@@ -504,11 +604,11 @@ class _PetugasPageState extends State<PetugasPage> {
                                   Icon(
                                     pegawai[index]['isActive']
                                         ? Icons.check_circle
-                                        : Icons.cancel, // Ikon yang lebih ekspresif
+                                        : Icons.cancel,
                                     color: pegawai[index]['isActive']
-                                        ? Colors.green[400] // Warna hijau lebih terang
-                                        : Colors.red[400], // Warna merah lebih terang
-                                    size: 20, // Ukuran ikon
+                                        ? Colors.green[400]
+                                        : Colors.red[400],
+                                    size: 20,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -517,7 +617,7 @@ class _PetugasPageState extends State<PetugasPage> {
                                         : 'Tidak Aktif',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500, // Sedikit lebih tebal
+                                      fontWeight: FontWeight.w500,
                                       color: pegawai[index]['isActive']
                                           ? Colors.green[400]
                                           : Colors.red[400],
@@ -526,7 +626,7 @@ class _PetugasPageState extends State<PetugasPage> {
                                 ],
                               ),
 
-                              const SizedBox(height: 10), // Spasi antar blok info
+                              const SizedBox(height: 10),
 
                               // Detail Informasi Lainnya
                               _buildInfoRow('👤', pegawai[index]['username'], Colors.white70),
@@ -545,10 +645,10 @@ class _PetugasPageState extends State<PetugasPage> {
                           onChanged: (bool value) {
                             _updatePegawaiStatus(pegawai[index]['documentId'], value);
                           },
-                          activeColor: Colors.green[700], // Warna switch aktif lebih gelap
-                          inactiveThumbColor: Colors.red[700], // Warna switch non-aktif lebih gelap
-                          trackColor: MaterialStateProperty.all(Colors.white.withOpacity(0.3)), // Warna track
-                          splashRadius: 20, // Efek riak saat disentuh
+                          activeColor: Colors.green[700],
+                          inactiveThumbColor: Colors.red[700],
+                          trackColor: MaterialStateProperty.all(Colors.white.withOpacity(0.3)),
+                          splashRadius: 20,
                         ),
                       ],
                     ),
@@ -563,11 +663,11 @@ class _PetugasPageState extends State<PetugasPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: "addPegawaiBtn",
         onPressed: _showAddPegawaiDialog,
-        backgroundColor: Colors.brown[600], // Warna FAB lebih gelap
-        foregroundColor: Colors.white, // Warna ikon FAB
-        elevation: 8, // Elevasi FAB
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), // Bentuk FAB
-        child: const Icon(Icons.person_add), // Ikon FAB yang lebih relevan
+        backgroundColor: Colors.brown[600],
+        foregroundColor: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: const Icon(Icons.person_add),
       ),
     );
   }
@@ -576,17 +676,17 @@ class _PetugasPageState extends State<PetugasPage> {
   // Menambahkan parameter 'textColor' untuk fleksibilitas
   Widget _buildInfoRow(String icon, String text, [Color? textColor]) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0), // Padding lebih kecil
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align top
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 18, color: Colors.white)), // Ikon lebih besar
+          Text(icon, style: const TextStyle(fontSize: 18, color: Colors.white)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 16, color: textColor ?? Colors.white70), // Warna teks info
-              softWrap: true, // Memungkinkan teks wrap ke baris baru
+              style: TextStyle(fontSize: 16, color: textColor ?? Colors.white70),
+              softWrap: true,
             ),
           ),
         ],
