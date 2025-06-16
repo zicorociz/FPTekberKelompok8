@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_page.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() => runApp(MyApp());
+const supabaseUrl = 'https://jmnqcyxvjsutbnddabue.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbnFjeXh2anN1dGJuZGRhYnVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5Njg5MzEsImV4cCI6MjA2NTU0NDkzMX0.hsHx-3n6RKRhuv-VHJiyRc5aUWgrazr5M3aMrDjr9vk';
+
+
+// void main() => runApp(MyApp());
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
 
 const String backgroundImagePath = 'assets/images/background.png';
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

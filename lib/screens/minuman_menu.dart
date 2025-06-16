@@ -1,7 +1,8 @@
 import 'dart:typed_data'; // Untuk Uint8List
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'add_menu_page.dart';
+import 'package:intl/intl.dart'; // Penting: Import ini untuk DateFormat
 
 // --- MODEL DATA (Tidak ada perubahan) ---
 class OrderItem {
@@ -18,14 +19,23 @@ class OrderItem {
   });
 
   double get priceAsDouble => double.parse(
-    price.replaceAll('Rp', '').replaceAll('.', '').replaceAll(',-', '').trim(),
-  );
+        price.replaceAll('Rp', '').replaceAll('.', '').replaceAll(',-', '').trim(),
+      );
 
   double get totalPrice => quantity * priceAsDouble;
 }
 
 // --- HALAMAN MENU UTAMA (DENGAN FITUR SEARCH) ---
+
+// Typedef untuk callback saat pesanan dikonfirmasi dan siap dikirim ke parent
+typedef OnOrderConfirmedCallback = void Function(Map<String, dynamic> newOrder);
+
 class MinumanMenuPage extends StatefulWidget {
+  // Tambahkan properti callback untuk mengirim pesanan yang dikonfirmasi
+  final OnOrderConfirmedCallback? onOrderConfirmed;
+
+  const MinumanMenuPage({Key? key, this.onOrderConfirmed}) : super(key: key);
+
   @override
   State<MinumanMenuPage> createState() => _MinumanMenuPageState();
 }
@@ -158,12 +168,11 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
     int columns = (width > 1200)
         ? 5
         : (width > 900)
-        ? 4
-        : (width > 600)
-        ? 3
-        : 2;
+            ? 4
+            : (width > 600)
+                ? 3
+                : 2;
 
-    // DefaultTabController sudah dihapus. Langsung menggunakan Scaffold.
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.brown[800],
@@ -178,13 +187,13 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
             controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Cari menu...',
-              prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+              prefixIcon: const Icon(Icons.search, color: Colors.grey),
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               // Tambahkan tombol untuk menghapus teks pencarian
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
-                      icon: Icon(Icons.clear, color: Colors.grey[600]),
+                      icon: const Icon(Icons.clear, color: Colors.grey),
                       onPressed: () {
                         _searchController.clear();
                       },
@@ -194,36 +203,59 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
           ),
         ),
         actions: [
-          // Tombol keranjang tetap ada
+          // Tombol keranjang
           IconButton(
             icon: Badge(
               label: Text('$totalCartItems'),
               isLabelVisible: totalCartItems > 0,
-              child: Icon(Icons.shopping_cart),
+              child: const Icon(Icons.shopping_cart),
             ),
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              // Menunggu hasil dari CartPage (Map data pesanan)
+              final newOrderData = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => CartPage(
                     cart: _cart,
                     totalOrderPrice: totalOrderPrice,
-                    onConfirm: () {
-                      setState(() {
-                        _cart.clear();
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Pesanan berhasil dikonfirmasi!'),
-                        ),
-                      );
+                    // Callback onConfirm yang sekarang menerima customerName
+                    onConfirm: (List<OrderItem> confirmedCart, double finalPrice, String customerName) {
+                      // Buat format data pesanan yang sesuai untuk PesananMasukPage
+                      final orderItemsNames =
+                          confirmedCart.map((item) => "${item.name} (${item.quantity}x)").toList();
+                      final newOrderId = DateTime.now().millisecondsSinceEpoch;
+                      final newOrder = {
+                        'id': newOrderId,
+                        'nama': customerName, // Gunakan nama dari input form
+                        'pesanan': orderItemsNames,
+                        'waktu': DateFormat('HH:mm a').format(DateTime.now()), // Format waktu lebih spesifik
+                        'status': 'Baru',
+                        'totalHarga': finalPrice, // Tambahkan total harga
+                      };
+                      return newOrder; // Kembalikan data pesanan
                     },
                   ),
                 ),
               );
+
+              // Jika ada data pesanan yang dikonfirmasi kembali dari CartPage
+              if (newOrderData != null && newOrderData is Map<String, dynamic>) {
+                setState(() {
+                  _cart.clear(); // Hapus item dari keranjang setelah dikonfirmasi
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Pesanan berhasil dikonfirmasi dan ditambahkan!'),
+                  ),
+                );
+
+                // Panggil callback onOrderConfirmed yang diberikan dari parent (misal DashboardPage)
+                if (widget.onOrderConfirmed != null) {
+                  widget.onOrderConfirmed!(newOrderData);
+                }
+              }
             },
           ),
         ],
-        // Properti 'bottom' (untuk TabBar) sudah dihapus
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown[900],
@@ -249,7 +281,6 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
             fit: BoxFit.cover,
           ),
         ),
-        // TabBarView sudah dihapus, langsung panggil widget grid
         child: _buildMenuGrid(columns),
       ),
     );
@@ -297,8 +328,7 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                       final quantityInCart = _getQuantityInCart(item);
 
                       Widget imageWidget;
-                      if (item['image'] is String &&
-                          item['image'].startsWith('assets/')) {
+                      if (item['image'] is String && item['image'].startsWith('assets/')) {
                         imageWidget = CircleAvatar(
                           radius: 40,
                           backgroundImage: AssetImage(item['image']),
@@ -324,9 +354,7 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                           side: BorderSide(
-                            color: quantityInCart > 0
-                                ? Colors.brown.shade400
-                                : Colors.transparent,
+                            color: quantityInCart > 0 ? Colors.brown.shade400 : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -376,28 +404,25 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       IconButton(
-                                        icon: Icon(
+                                        icon: const Icon(
                                           Icons.remove_circle,
                                           color: Colors.red,
                                         ),
-                                        onPressed: quantityInCart > 0
-                                            ? () => _updateQuantity(item, -1)
-                                            : null,
+                                        onPressed: quantityInCart > 0 ? () => _updateQuantity(item, -1) : null,
                                       ),
                                       Text(
                                         '$quantityInCart',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       IconButton(
-                                        icon: Icon(
+                                        icon: const Icon(
                                           Icons.add_circle,
                                           color: Colors.green,
                                         ),
-                                        onPressed: () =>
-                                            _updateQuantity(item, 1),
+                                        onPressed: () => _updateQuantity(item, 1),
                                       ),
                                     ],
                                   ),
@@ -416,26 +441,43 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
   }
 }
 
-// --- HALAMAN KERANJANG (Tidak ada perubahan) ---
-class CartPage extends StatelessWidget {
+typedef CartConfirmationCallback = Map<String, dynamic> Function(
+    List<OrderItem> confirmedCart, double finalPrice, String customerName);
+
+class CartPage extends StatefulWidget {
   final List<OrderItem> cart;
-  final Function onConfirm;
+  final CartConfirmationCallback onConfirm; // Menggunakan typedef baru yang lebih spesifik
   final double totalOrderPrice;
 
   CartPage({
+    Key? key,
     required this.cart,
     required this.onConfirm,
     required this.totalOrderPrice,
-  });
+  }) : super(key: key);
+
+  @override
+  _CartPageState createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+  final TextEditingController _customerNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _customerNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Keranjang Pesanan"),
+        title: const Text("Keranjang Pesanan"), // Gunakan 'const' untuk performa
         backgroundColor: Colors.brown[800],
       ),
-      body: cart.isEmpty
+      // Cek apakah keranjang kosong
+      body: widget.cart.isEmpty // Akses properti dari widget menggunakan 'widget.'
           ? Center(
               child: Text(
                 'Keranjang Anda masih kosong.',
@@ -444,34 +486,58 @@ class CartPage extends StatelessWidget {
             )
           : Column(
               children: [
+                // --- BAGIAN INPUT NAMA PEMESAN ---
+                Padding(
+                  padding: const EdgeInsets.all(16.0), // Gunakan 'const'
+                  child: TextField(
+                    controller: _customerNameController, // Hubungkan dengan controller
+                    decoration: InputDecoration(
+                      labelText: 'Nama Pemesan',
+                      hintText: 'Masukkan nama pelanggan',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.9),
+                      prefixIcon: const Icon(Icons.person), // Gunakan 'const'
+                    ),
+                  ),
+                ),
+                // --- AKHIR BAGIAN INPUT NAMA PEMESAN ---
+
                 Expanded(
                   child: ListView.builder(
-                    itemCount: cart.length,
+                    itemCount: widget.cart.length, // Akses properti 'cart' dari 'widget.'
                     itemBuilder: (context, index) {
-                      final item = cart[index];
+                      final item = widget.cart[index]; // Akses item keranjang
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundImage: AssetImage(item.image),
+                          // Cek apakah image adalah asset atau bukan
+                          backgroundImage: item.image.startsWith('assets/')
+                              ? AssetImage(item.image)
+                              : null, // Jika bukan asset, bisa jadi null atau pakai placeholder
+                          // Tambahkan child jika backgroundImage null (misal dari Uint8List)
+                          child: item.image.startsWith('assets/') ? null : const Icon(Icons.coffee), // Gunakan 'const'
                         ),
                         title: Text(item.name),
                         subtitle: Text('${item.quantity} x ${item.price}'),
                         trailing: Text(
                           'Rp${item.totalPrice.toStringAsFixed(0)}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold), // Gunakan 'const'
                         ),
                       );
                     },
                   ),
                 ),
-                Divider(height: 1),
+                const Divider(height: 1), // Gunakan 'const'
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0), // Gunakan 'const'
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text( // Gunakan 'const'
                             'Total Harga:',
                             style: TextStyle(
                               fontSize: 20,
@@ -479,7 +545,7 @@ class CartPage extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Rp${totalOrderPrice.toStringAsFixed(0)}',
+                            'Rp${widget.totalOrderPrice.toStringAsFixed(0)}', // Akses 'totalOrderPrice' dari 'widget.'
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -488,28 +554,45 @@ class CartPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20), // Gunakan 'const'
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[700],
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            padding: const EdgeInsets.symmetric(vertical: 15), // Gunakan 'const'
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           onPressed: () {
-                            onConfirm();
-                            Navigator.pop(context);
+                            // Ambil nama pemesan dari controller TextField
+                            final customerName = _customerNameController.text.trim();
+
+                            // Validasi: Jika nama pemesan kosong, tampilkan snackbar dan jangan lanjutkan
+                            if (customerName.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar( // Gunakan 'const'
+                                  content: Text('Nama pemesan tidak boleh kosong!'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return; // Hentikan fungsi di sini
+                            }
+                            final confirmedOrder = widget.onConfirm(
+                              widget.cart, // Kirim daftar item di keranjang
+                              widget.totalOrderPrice, // Kirim total harga
+                              customerName, // Kirim nama pemesan yang diinput
+                            );
+                            Navigator.pop(context, confirmedOrder);
                           },
-                          child: Text(
+                          child: const Text( // Gunakan 'const'
                             "Konfirmasi Pesanan",
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10), // Gunakan 'const'
                     ],
                   ),
                 ),
