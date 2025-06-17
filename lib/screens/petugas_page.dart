@@ -65,10 +65,6 @@ class _PetugasPageState extends State<PetugasPage> {
           print("ID Pengguna Saat Ini: $_userId");
 
           _pegawaiStream = FirebaseFirestore.instance
-              .collection('artifacts')
-              .doc(appId)
-              .collection('public') 
-              .doc('data')
               .collection('pegawai') 
               .orderBy('id', descending: false)
               .snapshots();
@@ -155,10 +151,6 @@ class _PetugasPageState extends State<PetugasPage> {
 
       int newId = 0;
       final QuerySnapshot currentDocs = await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
           .collection('pegawai')
           .get();
       if (currentDocs.docs.isNotEmpty) {
@@ -185,12 +177,9 @@ class _PetugasPageState extends State<PetugasPage> {
 
       // Tambahkan data pegawai ke koleksi 'pegawai' di Firestore
       await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
           .collection('pegawai')
-          .add({
+          .doc(username)
+          .set({
             'id': newId,
             'nama': nama,
             'username': username,
@@ -247,10 +236,6 @@ class _PetugasPageState extends State<PetugasPage> {
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
           .collection('pegawai')
           .doc(docId)
           .delete();
@@ -277,10 +262,6 @@ class _PetugasPageState extends State<PetugasPage> {
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
           .collection('pegawai')
           .doc(docId)
           .update({'isActive': newValue});

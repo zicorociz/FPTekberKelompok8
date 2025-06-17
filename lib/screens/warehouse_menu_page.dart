@@ -107,11 +107,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           // BARIS INI DIHAPUS: print("ID Pengguna Saat Ini (Warehouse): $_userId");
 
           _warehouseItemsStream = FirebaseFirestore.instance
-              .collection('artifacts')
-              .doc(appId)
-              .collection('public')
-              .doc('data')
-              .collection('warehouse') // UBAH DI SINI: Nama koleksi menjadi 'warehouse' (lowercase)
+              .collection('warehouse')
               .orderBy('name', descending: false) // Urutkan berdasarkan nama
               .snapshots();
           _isLoading = false;
@@ -119,8 +115,6 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       }
     });
   }
-
-  // Fungsi yang menerapkan filter ke _allItemsFromFirestore dan memperbarui _filteredItems
   void _applyFilter() { // Nama diubah menjadi _applyFilter
     final query = _searchController.text.toLowerCase();
     _filteredItems = _allItemsFromFirestore.where((item) {
@@ -138,11 +132,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
-          .collection('warehouse') // UBAH DI SINI: Nama koleksi menjadi 'warehouse' (lowercase)
+          .collection('warehouse') 
           .add(item.toFirestore()); // Menggunakan toFirestore() dari model
       _showMessage('Barang "${item.name}" berhasil ditambahkan!');
     } catch (e) {
@@ -159,12 +149,8 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
-          .collection('warehouse') // UBAH DI SINI: Nama koleksi menjadi 'warehouse' (lowercase)
-          .doc(item.id) // Menggunakan Document ID untuk update
+          .collection('warehouse') 
+          .doc(item.id) 
           .update(item.toFirestore());
       _showMessage('Barang "${item.name}" berhasil diperbarui!');
     } catch (e) {
@@ -181,11 +167,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
     final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
-          .collection('artifacts')
-          .doc(appId)
-          .collection('public')
-          .doc('data')
-          .collection('warehouse') // UBAH DI SINI: Nama koleksi menjadi 'warehouse' (lowercase)
+          .collection('warehouse') 
           .doc(item.id)
           .delete();
       _showMessage('Barang "${item.name}" telah dihapus!');

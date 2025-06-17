@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'home_screen.dart';
 import 'signup_page.dart';
 
@@ -13,25 +15,50 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _signIn() {
-    final email = _emailController.text.trim();
+  Future<void> _signIn() async {
+    final email = _emailController.text.trim().toLowerCase();
     final password = _passwordController.text;
 
-    final emailValid = RegExp(
-      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-    ).hasMatch(email);
+    final emailValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
 
     if (email.isEmpty || password.isEmpty) {
       _showError('Email dan password wajib diisi.');
+      return;
     } else if (!emailValid) {
       _showError('Format email tidak valid.');
+      return;
     } else if (password.length < 8) {
       _showError('Password tidak boleh kurang dari 8 karakter.');
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
+      return;
+    }
+
+    try {
+      // GANTI: Query ke koleksi 'petugas' di root
+      final snapshot = await FirebaseFirestore.instance
+          .collection('petugas')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        _showError('Akun tidak ditemukan.');
+        return;
+      }
+
+      final akunData = snapshot.docs.first.data();
+      final storedPassword = akunData['password'];
+
+      if (storedPassword == password) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => HomeScreen()),
+        );
+      } else {
+        _showError('Password salah.');
+      }
+    } catch (e) {
+      print('Login error: $e');
+      _showError('Terjadi kesalahan saat login.');
     }
   }
 
@@ -57,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(backgroundImagePath),
+            image: AssetImage(backgroundImagePath), // FIX: Ganti NetworkImage ke AssetImage
             fit: BoxFit.cover,
           ),
         ),
