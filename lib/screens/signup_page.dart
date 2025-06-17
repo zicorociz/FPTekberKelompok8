@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
+import '../global.dart'; // sesuaikan path jika perlu
+
 
 const String backgroundImagePath = 'assets/images/background.png';
 
@@ -49,6 +51,9 @@ class _SignUpPageState extends State<SignUpPage> {
               'jamKerja': '',
               'isActive': false,
             });
+
+            currentUserEmail = email;
+        
 
         Navigator.pushReplacement(
           context,

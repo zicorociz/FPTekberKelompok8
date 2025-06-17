@@ -1,0 +1,2 @@
+// global.dart
+String? currentUserEmail;
