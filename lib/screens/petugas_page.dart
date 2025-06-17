@@ -55,8 +55,6 @@ class _PetugasPageState extends State<PetugasPage> {
 
   // Fungsi untuk menginisialisasi Firebase Auth dan mengatur stream Firestore
   Future<void> _initializeFirebaseAndAuth() async {
-    // Dapatkan APP ID dari environment Canvas
-    final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
 
     _auth.authStateChanges().listen((User? user) {
       if (mounted) { 

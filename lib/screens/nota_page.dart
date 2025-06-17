@@ -49,7 +49,7 @@ class NotaPage extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 Text(
-                  'Nama: ${pesanan['nama']}',
+                  'Nama: ${pesanan['namaPemesan'] ?? '-'}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

@@ -161,7 +161,6 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
   // Fungsi untuk menghapus item dari Firestore
   Future<void> _deleteItemFromFirestore(WarehouseItem item) async {
     setState(() { _isSavingOrDeleting = true; });
-    final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
           .collection('warehouse') 
