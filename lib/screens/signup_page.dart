@@ -40,7 +40,7 @@ class _SignUpPageState extends State<SignUpPage> {
       try {
         // Simpan data ke Firestore, ke koleksi 'petugas', dengan docID = email
         await FirebaseFirestore.instance
-            .collection('petugas')
+            .collection('signup')
             .doc(email)
             .set({
               'nama': name,
