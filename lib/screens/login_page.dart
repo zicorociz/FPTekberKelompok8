@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       // GANTI: Query ke koleksi 'petugas' di root
       final snapshot = await FirebaseFirestore.instance
-          .collection('petugas')
+          .collection('signup')
           .where('email', isEqualTo: email)
           .limit(1)
           .get();
