@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart';
 import 'signup_page.dart';
+import '../global.dart'; // path relatif dari screens ke global
+
 
 const String backgroundImagePath = 'assets/images/background.png';
 
@@ -48,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
       final storedPassword = akunData['password'];
 
       if (storedPassword == password) {
+        currentUserEmail = email; // ✅ simpan email ke global
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => HomeScreen()),
