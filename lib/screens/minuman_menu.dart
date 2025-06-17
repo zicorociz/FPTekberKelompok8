@@ -452,15 +452,181 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
 }
 
 
+// typedef CartConfirmationCallback = Map<String, dynamic> Function(
+//     List<OrderItem> confirmedCart, double finalPrice, String customerName);
+
+// class CartPage extends StatefulWidget {
+//   final List<OrderItem> cart;
+//   final CartConfirmationCallback onConfirm; // Menggunakan typedef baru yang lebih spesifik
+//   final double totalOrderPrice;
+
+//   CartPage({
+//     Key? key,
+//     required this.cart,
+//     required this.onConfirm,
+//     required this.totalOrderPrice,
+//   }) : super(key: key);
+
+//   @override
+//   _CartPageState createState() => _CartPageState();
+// }
+
+// class _CartPageState extends State<CartPage> {
+//   final TextEditingController _customerNameController = TextEditingController();
+
+//   @override
+//   void dispose() {
+//     _customerNameController.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Keranjang Pesanan"), // Gunakan 'const' untuk performa
+//         backgroundColor: Colors.brown[800],
+//       ),
+//       // Cek apakah keranjang kosong
+//       body: widget.cart.isEmpty // Akses properti dari widget menggunakan 'widget.'
+//           ? Center(
+//               child: Text(
+//                 'Keranjang Anda masih kosong.',
+//                 style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+//               ),
+//             )
+//           : Column(
+//               children: [
+//                 // --- BAGIAN INPUT NAMA PEMESAN ---
+//                 Padding(
+//                   padding: const EdgeInsets.all(16.0), // Gunakan 'const'
+//                   child: TextField(
+//                     controller: _customerNameController, // Hubungkan dengan controller
+//                     decoration: InputDecoration(
+//                       labelText: 'Nama Pemesan',
+//                       hintText: 'Masukkan nama pelanggan',
+//                       border: OutlineInputBorder(
+//                         borderRadius: BorderRadius.circular(10),
+//                       ),
+//                       filled: true,
+//                       fillColor: Colors.white.withOpacity(0.9),
+//                       prefixIcon: const Icon(Icons.person), // Gunakan 'const'
+//                     ),
+//                   ),
+//                 ),
+//                 // --- AKHIR BAGIAN INPUT NAMA PEMESAN ---
+
+//                 Expanded(
+//                   child: ListView.builder(
+//                     itemCount: widget.cart.length, // Akses properti 'cart' dari 'widget.'
+//                     itemBuilder: (context, index) {
+//                       final item = widget.cart[index]; // Akses item keranjang
+//                       return ListTile(
+//                         leading: CircleAvatar(
+//                           // Cek apakah image adalah asset atau bukan
+//                           backgroundImage: item.image.startsWith('assets/')
+//                               ? AssetImage(item.image)
+//                               : null, // Jika bukan asset, bisa jadi null atau pakai placeholder
+//                           // Tambahkan child jika backgroundImage null (misal dari Uint8List)
+//                           child: item.image.startsWith('assets/') ? null : const Icon(Icons.coffee), // Gunakan 'const'
+//                         ),
+//                         title: Text(item.name),
+//                         subtitle: Text('${item.quantity} x ${item.price}'),
+//                         trailing: Text(
+//                           'Rp${item.totalPrice.toStringAsFixed(0)}',
+//                           style: const TextStyle(fontWeight: FontWeight.bold), // Gunakan 'const'
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ),
+//                 const Divider(height: 1), // Gunakan 'const'
+//                 Padding(
+//                   padding: const EdgeInsets.all(16.0), // Gunakan 'const'
+//                   child: Column(
+//                     children: [
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           const Text( // Gunakan 'const'
+//                             'Total Harga:',
+//                             style: TextStyle(
+//                               fontSize: 20,
+//                               fontWeight: FontWeight.bold,
+//                             ),
+//                           ),
+//                           Text(
+//                             'Rp${widget.totalOrderPrice.toStringAsFixed(0)}', // Akses 'totalOrderPrice' dari 'widget.'
+//                             style: TextStyle(
+//                               fontSize: 20,
+//                               fontWeight: FontWeight.bold,
+//                               color: Colors.green[700],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       const SizedBox(height: 20), // Gunakan 'const'
+//                       SizedBox(
+//                         width: double.infinity,
+//                         child: ElevatedButton(
+//                           style: ElevatedButton.styleFrom(
+//                             backgroundColor: Colors.green[700],
+//                             padding: const EdgeInsets.symmetric(vertical: 15), // Gunakan 'const'
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius: BorderRadius.circular(10),
+//                             ),
+//                           ),
+//                           onPressed: () {
+//                             // Ambil nama pemesan dari controller TextField
+//                             final customerName = _customerNameController.text.trim();
+
+//                             // Validasi: Jika nama pemesan kosong, tampilkan snackbar dan jangan lanjutkan
+//                             if (customerName.isEmpty) {
+//                               ScaffoldMessenger.of(context).showSnackBar(
+//                                 const SnackBar( // Gunakan 'const'
+//                                   content: Text('Nama pemesan tidak boleh kosong!'),
+//                                   backgroundColor: Colors.red,
+//                                 ),
+//                               );
+//                               return; // Hentikan fungsi di sini
+//                             }
+//                             final confirmedOrder = widget.onConfirm(
+//                               widget.cart, // Kirim daftar item di keranjang
+//                               widget.totalOrderPrice, // Kirim total harga
+//                               customerName, // Kirim nama pemesan yang diinput
+//                             );
+//                             Navigator.pop(context, confirmedOrder);
+//                           },
+//                           child: const Text( // Gunakan 'const'
+//                             "Konfirmasi Pesanan",
+//                             style: TextStyle(fontSize: 18, color: Colors.white),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 10), // Gunakan 'const'
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//     );
+//   }
+// }
+
+
+// Typedef untuk callback konfirmasi
 typedef CartConfirmationCallback = Map<String, dynamic> Function(
-    List<OrderItem> confirmedCart, double finalPrice, String customerName);
+  List<OrderItem> confirmedCart,
+  double finalPrice,
+  String customerName,
+);
 
 class CartPage extends StatefulWidget {
   final List<OrderItem> cart;
-  final CartConfirmationCallback onConfirm; // Menggunakan typedef baru yang lebih spesifik
+  final CartConfirmationCallback onConfirm;
   final double totalOrderPrice;
 
-  CartPage({
+  const CartPage({
     Key? key,
     required this.cart,
     required this.onConfirm,
@@ -480,15 +646,71 @@ class _CartPageState extends State<CartPage> {
     super.dispose();
   }
 
+  Future<void> _handleConfirmOrder() async {
+    final customerName = _customerNameController.text.trim();
+
+    if (customerName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nama pemesan tidak boleh kosong!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Convert cart to Firestore-compatible map
+      List<Map<String, dynamic>> itemList = widget.cart.map((item) {
+        return {
+          'nama': item.name,
+          'jumlah': item.quantity,
+          'harga': item.price,
+          'total': item.totalPrice,
+        };
+      }).toList();
+
+      // Save to Firestore
+      await FirebaseFirestore.instance.collection('pesanan').add({
+        'namaPemesan': customerName,
+        'totalHarga': widget.totalOrderPrice,
+        'tanggalPesan': DateTime.now().toIso8601String(),
+        'items': itemList,
+      });
+
+      // Success feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pesanan berhasil disimpan!'),
+          backgroundColor: Color.fromARGB(255, 74, 148, 77),
+        ),
+      );
+
+      final confirmedOrder = widget.onConfirm(
+        widget.cart,
+        widget.totalOrderPrice,
+        customerName,
+      );
+
+      Navigator.pop(context, confirmedOrder);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyimpan pesanan: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Keranjang Pesanan"), // Gunakan 'const' untuk performa
+        title: const Text("Keranjang Pesanan"),
         backgroundColor: Colors.brown[800],
       ),
-      // Cek apakah keranjang kosong
-      body: widget.cart.isEmpty // Akses properti dari widget menggunakan 'widget.'
+      body: widget.cart.isEmpty
           ? Center(
               child: Text(
                 'Keranjang Anda masih kosong.',
@@ -497,11 +719,10 @@ class _CartPageState extends State<CartPage> {
             )
           : Column(
               children: [
-                // --- BAGIAN INPUT NAMA PEMESAN ---
                 Padding(
-                  padding: const EdgeInsets.all(16.0), // Gunakan 'const'
+                  padding: const EdgeInsets.all(16.0),
                   child: TextField(
-                    controller: _customerNameController, // Hubungkan dengan controller
+                    controller: _customerNameController,
                     decoration: InputDecoration(
                       labelText: 'Nama Pemesan',
                       hintText: 'Masukkan nama pelanggan',
@@ -510,45 +731,43 @@ class _CartPageState extends State<CartPage> {
                       ),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.9),
-                      prefixIcon: const Icon(Icons.person), // Gunakan 'const'
+                      prefixIcon: const Icon(Icons.person),
                     ),
                   ),
                 ),
-                // --- AKHIR BAGIAN INPUT NAMA PEMESAN ---
-
                 Expanded(
                   child: ListView.builder(
-                    itemCount: widget.cart.length, // Akses properti 'cart' dari 'widget.'
+                    itemCount: widget.cart.length,
                     itemBuilder: (context, index) {
-                      final item = widget.cart[index]; // Akses item keranjang
+                      final item = widget.cart[index];
                       return ListTile(
                         leading: CircleAvatar(
-                          // Cek apakah image adalah asset atau bukan
                           backgroundImage: item.image.startsWith('assets/')
                               ? AssetImage(item.image)
-                              : null, // Jika bukan asset, bisa jadi null atau pakai placeholder
-                          // Tambahkan child jika backgroundImage null (misal dari Uint8List)
-                          child: item.image.startsWith('assets/') ? null : const Icon(Icons.coffee), // Gunakan 'const'
+                              : null,
+                          child: item.image.startsWith('assets/')
+                              ? null
+                              : const Icon(Icons.coffee),
                         ),
                         title: Text(item.name),
                         subtitle: Text('${item.quantity} x ${item.price}'),
                         trailing: Text(
                           'Rp${item.totalPrice.toStringAsFixed(0)}',
-                          style: const TextStyle(fontWeight: FontWeight.bold), // Gunakan 'const'
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       );
                     },
                   ),
                 ),
-                const Divider(height: 1), // Gunakan 'const'
+                const Divider(height: 1),
                 Padding(
-                  padding: const EdgeInsets.all(16.0), // Gunakan 'const'
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text( // Gunakan 'const'
+                          const Text(
                             'Total Harga:',
                             style: TextStyle(
                               fontSize: 20,
@@ -556,7 +775,7 @@ class _CartPageState extends State<CartPage> {
                             ),
                           ),
                           Text(
-                            'Rp${widget.totalOrderPrice.toStringAsFixed(0)}', // Akses 'totalOrderPrice' dari 'widget.'
+                            'Rp${widget.totalOrderPrice.toStringAsFixed(0)}',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -565,45 +784,25 @@ class _CartPageState extends State<CartPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20), // Gunakan 'const'
+                      const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[700],
-                            padding: const EdgeInsets.symmetric(vertical: 15), // Gunakan 'const'
+                            padding: const EdgeInsets.symmetric(vertical: 15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () {
-                            // Ambil nama pemesan dari controller TextField
-                            final customerName = _customerNameController.text.trim();
-
-                            // Validasi: Jika nama pemesan kosong, tampilkan snackbar dan jangan lanjutkan
-                            if (customerName.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar( // Gunakan 'const'
-                                  content: Text('Nama pemesan tidak boleh kosong!'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return; // Hentikan fungsi di sini
-                            }
-                            final confirmedOrder = widget.onConfirm(
-                              widget.cart, // Kirim daftar item di keranjang
-                              widget.totalOrderPrice, // Kirim total harga
-                              customerName, // Kirim nama pemesan yang diinput
-                            );
-                            Navigator.pop(context, confirmedOrder);
-                          },
-                          child: const Text( // Gunakan 'const'
+                          onPressed: _handleConfirmOrder,
+                          child: const Text(
                             "Konfirmasi Pesanan",
                             style: TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10), // Gunakan 'const'
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),

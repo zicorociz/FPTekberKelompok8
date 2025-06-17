@@ -67,17 +67,17 @@ class NotaPage extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Column(
-                  children: pesanan['pesanan']
-                      .map<Widget>(
-                        (item) => ListTile(
-                          leading: Icon(Icons.coffee, color: Colors.white),
-                          title: Text(
-                            item,
-                            style: TextStyle(color: Colors.white),
-                          ),
+                  children: List<Widget>.from(
+                    (pesanan['items'] ?? []).map<Widget>(
+                      (item) => ListTile(
+                        leading: Icon(Icons.coffee, color: Colors.white),
+                        title: Text(
+                          '${item['nama']} x${item['jumlah']} - ${item['harga']}',
+                          style: TextStyle(color: Colors.white),
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ),
                 ),
                 Divider(color: Colors.brown[400]),
                 SizedBox(height: 10),

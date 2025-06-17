@@ -98,7 +98,6 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
 
   // Inisialisasi Firebase dan Autentikasi
   Future<void> _initializeFirebaseAndAuth() async {
-    final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
 
     _auth.authStateChanges().listen((User? user) {
       if (mounted) {
@@ -129,7 +128,6 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
   // Fungsi untuk menambah item baru ke Firestore
   Future<void> _addItemToFirestore(WarehouseItem item) async {
     setState(() { _isSavingOrDeleting = true; });
-    final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
           .collection('warehouse') 
@@ -146,7 +144,6 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
   // Fungsi untuk mengupdate item di Firestore
   Future<void> _updateItemInFirestore(WarehouseItem item) async {
     setState(() { _isSavingOrDeleting = true; });
-    final String appId = const String.fromEnvironment('FLUTTER_APP_ID', defaultValue: 'default-app-id');
     try {
       await FirebaseFirestore.instance
           .collection('warehouse') 
@@ -396,11 +393,11 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           );
         }
 
-        return Column( // Ganti Expanded(child: ListView) menjadi Column untuk menampung stats
+        return Column( 
           children: [
-            _buildStatsWidget(), // Panggil widget statistik di sini
+            _buildStatsWidget(),
             _buildTableHeader(),
-            Expanded( // Expanded diperlukan karena ListView.builder di dalam Column
+            Expanded( 
               child: ListView.builder(
                 itemCount: _filteredItems.length,
                 itemBuilder: (context, index) {
@@ -526,7 +523,7 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
               flex: 2,
               child: Text(
                 'Rp${item.price.toStringAsFixed(0)}',
-                textAlign: TextAlign.right, // Perataan kanan untuk harga
+                textAlign: TextAlign.right, 
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
@@ -534,14 +531,14 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
               flex: 1,
               child: Text(
                 item.stock.toString(),
-                textAlign: TextAlign.right, // Perataan kanan untuk stok
+                textAlign: TextAlign.right, 
                 style: TextStyle(color: item.stock < 10 ? Colors.redAccent : Colors.white, fontWeight: item.stock < 10 ? FontWeight.bold : FontWeight.normal, fontSize: 14), // Sorot stok rendah
               ),
             ),
             Expanded(
               flex: 2,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, // Tetap di tengah untuk aksi
+                mainAxisAlignment: MainAxisAlignment.center, 
                 children: [
                   IconButton(
                     icon: Icon(Icons.edit, color: Colors.blue[300], size: 20), // Warna lebih cerah
