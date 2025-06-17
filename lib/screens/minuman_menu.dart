@@ -1,8 +1,9 @@
 import 'dart:typed_data'; // Untuk Uint8List
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
 import 'add_menu_page.dart';
 import 'package:intl/intl.dart'; // Penting: Import ini untuk DateFormat
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 // --- MODEL DATA (Tidak ada perubahan) ---
 class OrderItem {
@@ -42,45 +43,10 @@ class MinumanMenuPage extends StatefulWidget {
 
 class _MinumanMenuPageState extends State<MinumanMenuPage> {
   final String backgroundImagePath = 'assets/images/background.png';
+  
 
   // Katalog produk asli (tidak diubah-ubah)
-  final List<Map<String, dynamic>> _allMenuItems = [
-    {
-      'name': 'Matcha Latte',
-      'description':
-          'A smooth and calming Japanese green tea, rich in antioxidants with a slightly bitter, earthy flavor.',
-      'price': 'Rp40.000,-',
-      'image': 'assets/images/matcha_latte.jpg',
-    },
-    {
-      'name': 'Espresso',
-      'description':
-          'Bold and intense, this shot of espresso delivers rich flavor and a perfect caffeine kick.',
-      'price': 'Rp35.000,-',
-      'image': 'assets/images/espresso.jpg',
-    },
-    {
-      'name': 'Lemon Squash',
-      'description':
-          'Zesty and refreshing, this sparkling lemon drink brings a burst of citrusy freshness in every sip.',
-      'price': 'Rp30.000,-',
-      'image': 'assets/images/lemon_squash.jpg',
-    },
-    {
-      'name': 'Caramel Macchiato',
-      'description':
-          'A layered espresso drink with steamed milk, vanilla syrup, and a rich caramel drizzle for a smooth, sweet finish.',
-      'price': 'Rp42.000,-',
-      'image': 'assets/images/caramel_macchiato.jpg',
-    },
-    {
-      'name': 'Mango Sticky Rice Latte',
-      'description':
-          'A unique blend of espresso, mango puree, and coconut milk, inspired by the Thai dessert for a creamy tropical twist.',
-      'price': 'Rp50.000,-',
-      'image': 'assets/images/mango.jpg',
-    },
-  ];
+  List<Map<String, dynamic>> _allMenuItems = [];
 
   // List untuk menampilkan item yang sudah difilter
   List<Map<String, dynamic>> _filteredMenuItems = [];
@@ -99,6 +65,7 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
     _filteredMenuItems = _allMenuItems;
     // Tambahkan listener untuk mendeteksi perubahan pada input search
     _searchController.addListener(_onSearchChanged);
+    _loadMinumanFromFirebase(); // tambahkan ini
   }
 
   @override
@@ -160,6 +127,28 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
       }
     });
   }
+  void _loadMinumanFromFirebase() {
+  FirebaseFirestore.instance
+      .collection('minuman_menu')
+      .snapshots()
+      .listen((snapshot) {
+    setState(() {
+      _allMenuItems = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id, // penting untuk edit/hapus nanti
+          'name': data['name'],
+          'description': data['description'],
+          'price': data['price'],
+          'image': data['image'],
+        };
+      }).toList();
+
+      _onSearchChanged(); // update hasil search
+    });
+  });
+}
+
 
   // --- BUILD METHOD ---
   @override
@@ -258,22 +247,34 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.brown[900],
-        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () async {
-          final result = await Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const AddMenuPage()));
+          final result = await Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AddMenuPage()),
+          );
 
           if (result != null && result is Map<String, dynamic>) {
-            setState(() {
-              // Tambahkan menu baru ke list utama, lalu filter ulang
-              _allMenuItems.add(result);
-              _onSearchChanged(); // Panggil fungsi ini agar list ter-update
-            });
+            try {
+              final String imageUrl = result['image']?.isNotEmpty == true
+                  ? result['image']
+                  : 'https://placehold.co/300x300/CCCCCC/000000?text=No+Image';
+
+              await FirebaseFirestore.instance.collection('minuman_menu').add({
+                'name': result['name'],
+                'description': result['description'],
+                'price': result['price'],
+                'image': imageUrl,
+                'createdAt': FieldValue.serverTimestamp(),
+              });
+
+              _showMessage('Menu berhasil ditambahkan!');
+            } catch (e) {
+              _showMessage('Gagal menambahkan menu: $e');
+            }
           }
         },
+        child: const Icon(Icons.add),
       ),
+
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -439,7 +440,17 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
       ),
     );
   }
+  void _showMessage(String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    ),
+  );
 }
+
+}
+
 
 typedef CartConfirmationCallback = Map<String, dynamic> Function(
     List<OrderItem> confirmedCart, double finalPrice, String customerName);

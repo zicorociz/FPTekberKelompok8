@@ -17,6 +17,9 @@ class _AddMenuPageState extends State<AddMenuPage> {
   Uint8List? _selectedImageBytes;
   final ImagePicker _picker = ImagePicker();
 
+  final Color themeColor = const Color(0xFF6B4226);
+  final Color accentColor = const Color.fromRGBO(78, 92, 54, 1);
+
   void _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -33,9 +36,9 @@ class _AddMenuPageState extends State<AddMenuPage> {
     if (_nameController.text.isEmpty ||
         _priceController.text.isEmpty ||
         _descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Harap isi semua kolom.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Harap isi semua kolom.')),
+      );
       return;
     }
 
@@ -51,9 +54,6 @@ class _AddMenuPageState extends State<AddMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = const Color(0xFF6B4226);
-    final accentColor = const Color.fromRGBO(78, 92, 54, 1);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: themeColor,
@@ -65,7 +65,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
       ),
       body: Stack(
         children: [
-          // Background image
+          // Background Image
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -75,10 +75,10 @@ class _AddMenuPageState extends State<AddMenuPage> {
             ),
           ),
 
-          // Optional: semi-transparent overlay supaya konten lebih terbaca
+          // Semi-transparent overlay
           Container(color: Colors.white.withOpacity(0.8)),
 
-          // Konten utama
+          // Main content
           SingleChildScrollView(
             padding: const EdgeInsets.all(35),
             child: Card(
@@ -106,6 +106,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                     ),
                     const SizedBox(height: 20),
 
+                    // Image preview or text
                     if (_selectedImageBytes != null)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -126,6 +127,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                       ),
                     const SizedBox(height: 12),
 
+                    // Upload Button
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accentColor,
@@ -149,6 +151,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
                     ),
                     const SizedBox(height: 30),
 
+                    // Save Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -180,6 +183,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
     );
   }
 
+  // Reusable text field builder
   Widget _buildTextField(
     TextEditingController controller,
     String label, {

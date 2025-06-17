@@ -85,16 +85,13 @@ class _PetugasPageState extends State<PetugasPage> {
         } else {
           _selectedImageBytes = null;
         }
-        setState(() {}); // Perbarui UI setelah gambar dipilih/bytes dibaca
+        setState(() {}); 
       }
     } catch (e) {
       print("Error memilih gambar: $e");
       _showMessage('Gagal memilih gambar.');
     }
   }
-
-  // Fungsi untuk mengunggah gambar ke Firebase Storage
-  // Mengembalikan Download URL gambar yang diunggah
   Future<String?> _uploadImageToFirebaseStorage(XFile? imageXFile) async {
     if (imageXFile == null) return null;
 
@@ -129,7 +126,6 @@ class _PetugasPageState extends State<PetugasPage> {
     }
   }
 
-  // Fungsi untuk menambahkan pegawai baru ke Firestore
   Future<void> _addPegawai() async {
     final String nama = _namaController.text.trim();
     final String username = _usernameController.text.trim();

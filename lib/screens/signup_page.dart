@@ -38,7 +38,6 @@ class _SignUpPageState extends State<SignUpPage> {
       _showError('Password dan Ulangi Password tidak cocok.');
     } else {
       try {
-        // Simpan data ke Firestore, ke koleksi 'petugas', dengan docID = email
         await FirebaseFirestore.instance
             .collection('signup')
             .doc(email)
