@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
 import '../global.dart'; // sesuaikan path jika perlu
 
-
 const String backgroundImagePath = 'assets/images/background.png';
 
 class SignUpPage extends StatefulWidget {
@@ -40,20 +39,16 @@ class _SignUpPageState extends State<SignUpPage> {
       _showError('Password dan Ulangi Password tidak cocok.');
     } else {
       try {
-        await FirebaseFirestore.instance
-            .collection('signup')
-            .doc(email)
-            .set({
-              'nama': name,
-              'email': email,
-              'password': password,
-              'shift': '',
-              'jamKerja': '',
-              'isActive': false,
-            });
+        await FirebaseFirestore.instance.collection('signup').doc(email).set({
+          'nama': name,
+          'email': email,
+          'password': password,
+          'shift': '',
+          'jamKerja': '',
+          'isActive': false,
+        });
 
-            currentUserEmail = email;
-        
+        currentUserEmail = email;
 
         Navigator.pushReplacement(
           context,
@@ -84,7 +79,10 @@ class _SignUpPageState extends State<SignUpPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Sign Up')),
+      appBar: AppBar(
+        title: Text('Sign Up', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

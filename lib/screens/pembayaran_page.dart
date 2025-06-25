@@ -15,14 +15,12 @@ class PembayaranPage extends StatelessWidget {
     required this.onPaymentConfirmed,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('pesanan').doc(docId).get(),
-        builder: (context, snapshot) {
+      future: FirebaseFirestore.instance.collection('pesanan').doc(docId).get(),
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          
           return Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
@@ -31,10 +29,11 @@ class PembayaranPage extends StatelessWidget {
         }
 
         final data = snapshot.data!.data() as Map<String, dynamic>;
-        final pesananList = (data['items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+        final pesananList =
+            (data['items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
         return Scaffold(
-          appBar: AppBar(title: Text('Pembayaran')),
+          appBar: AppBar(title: Text('Pembayaran'), centerTitle: true),
           body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -64,12 +63,18 @@ class PembayaranPage extends StatelessWidget {
                     SizedBox(height: 10),
                     ListTile(
                       leading: Icon(Icons.account_balance, color: Colors.white),
-                      title: Text('Transfer Bank', style: TextStyle(color: Colors.white)),
+                      title: Text(
+                        'Transfer Bank',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       onTap: () {},
                     ),
                     ListTile(
                       leading: Icon(Icons.wallet, color: Colors.white),
-                      title: Text('E-Wallet', style: TextStyle(color: Colors.white)),
+                      title: Text(
+                        'E-Wallet',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       onTap: () {},
                     ),
                     Divider(color: Colors.brown[400]),
@@ -111,7 +116,10 @@ class PembayaranPage extends StatelessWidget {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green[800],
-                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 15,
+                          ),
                         ),
                         onPressed: () {
                           onPaymentConfirmed();

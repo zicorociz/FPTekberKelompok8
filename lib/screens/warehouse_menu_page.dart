@@ -64,16 +64,13 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance; // Instance Firebase Auth
 
   // List untuk menyimpan data item dari Firestore setelah di-map
-  List<WarehouseItem> _allItemsFromFirestore = []; // Nama diubah agar jelas sumbernya
+  List<WarehouseItem> _allItemsFromFirestore =
+      []; // Nama diubah agar jelas sumbernya
   // List untuk menampilkan hasil filter/pencarian
   List<WarehouseItem> _filteredItems = [];
 
   final TextEditingController _searchController = TextEditingController();
-  final List<String> _categories = [
-    'alat makan',
-    'bahan baku',
-    'packaging',
-  ];
+  final List<String> _categories = ['alat makan', 'bahan baku', 'packaging'];
 
   String? _selectedFilterCategory; // Kategori yang dipilih untuk filter
 
@@ -98,7 +95,6 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
 
   // Inisialisasi Firebase dan Autentikasi
   Future<void> _initializeFirebaseAndAuth() async {
-
     _auth.authStateChanges().listen((User? user) {
       if (mounted) {
         setState(() {
@@ -114,11 +110,14 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       }
     });
   }
-  void _applyFilter() { // Nama diubah menjadi _applyFilter
+
+  void _applyFilter() {
+    // Nama diubah menjadi _applyFilter
     final query = _searchController.text.toLowerCase();
     _filteredItems = _allItemsFromFirestore.where((item) {
       final matchesName = item.name.toLowerCase().contains(query);
-      final matchesCategory = _selectedFilterCategory == null ||
+      final matchesCategory =
+          _selectedFilterCategory == null ||
           _selectedFilterCategory == 'Kategori' ||
           item.category.toLowerCase() == _selectedFilterCategory!.toLowerCase();
       return matchesName && matchesCategory;
@@ -127,43 +126,53 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
 
   // Fungsi untuk menambah item baru ke Firestore
   Future<void> _addItemToFirestore(WarehouseItem item) async {
-    setState(() { _isSavingOrDeleting = true; });
+    setState(() {
+      _isSavingOrDeleting = true;
+    });
     try {
       await FirebaseFirestore.instance
-          .collection('warehouse') 
+          .collection('warehouse')
           .add(item.toFirestore()); // Menggunakan toFirestore() dari model
       _showMessage('Barang "${item.name}" berhasil ditambahkan!');
     } catch (e) {
       print("Error menambahkan barang: $e");
       _showMessage('Gagal menambahkan barang: $e');
     } finally {
-      setState(() { _isSavingOrDeleting = false; });
+      setState(() {
+        _isSavingOrDeleting = false;
+      });
     }
   }
 
   // Fungsi untuk mengupdate item di Firestore
   Future<void> _updateItemInFirestore(WarehouseItem item) async {
-    setState(() { _isSavingOrDeleting = true; });
+    setState(() {
+      _isSavingOrDeleting = true;
+    });
     try {
       await FirebaseFirestore.instance
-          .collection('warehouse') 
-          .doc(item.id) 
+          .collection('warehouse')
+          .doc(item.id)
           .update(item.toFirestore());
       _showMessage('Barang "${item.name}" berhasil diperbarui!');
     } catch (e) {
       print("Error memperbarui barang: $e");
       _showMessage('Gagal memperbarui barang: $e');
     } finally {
-      setState(() { _isSavingOrDeleting = false; });
+      setState(() {
+        _isSavingOrDeleting = false;
+      });
     }
   }
 
   // Fungsi untuk menghapus item dari Firestore
   Future<void> _deleteItemFromFirestore(WarehouseItem item) async {
-    setState(() { _isSavingOrDeleting = true; });
+    setState(() {
+      _isSavingOrDeleting = true;
+    });
     try {
       await FirebaseFirestore.instance
-          .collection('warehouse') 
+          .collection('warehouse')
           .doc(item.id)
           .delete();
       _showMessage('Barang "${item.name}" telah dihapus!');
@@ -171,7 +180,9 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       print("Error menghapus barang: $e");
       _showMessage('Gagal menghapus barang: $e');
     } finally {
-      setState(() { _isSavingOrDeleting = false; });
+      setState(() {
+        _isSavingOrDeleting = false;
+      });
     }
   }
 
@@ -182,7 +193,9 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           content: Text(message),
           backgroundColor: Colors.brown[700],
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           margin: const EdgeInsets.all(10),
         ),
       );
@@ -193,7 +206,10 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
   Widget build(BuildContext context) {
     if (_userId == null || _isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Daftar Barang Warehouse')),
+        appBar: AppBar(
+          title: const Text('Daftar Barang Warehouse'),
+          centerTitle: true,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -204,12 +220,18 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
         centerTitle: true,
         backgroundColor: Colors.brown[900],
         elevation: 0,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(backgroundImagePath), // Gunakan NetworkImage untuk URL
+            image: NetworkImage(
+              backgroundImagePath,
+            ), // Gunakan NetworkImage untuk URL
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.7),
@@ -220,7 +242,9 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
         child: Column(
           children: [
             _buildSearchBar(),
-            Expanded(child: _buildItemsTable()), // _buildItemsTable sekarang juga akan menampilkan stats
+            Expanded(
+              child: _buildItemsTable(),
+            ), // _buildItemsTable sekarang juga akan menampilkan stats
           ],
         ),
       ),
@@ -229,7 +253,9 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
         foregroundColor: Colors.white,
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        onPressed: _isSavingOrDeleting ? null : () => _showItemDialog(), // Panggil tanpa item untuk tambah baru
+        onPressed: _isSavingOrDeleting
+            ? null
+            : () => _showItemDialog(), // Panggil tanpa item untuk tambah baru
         child: _isSavingOrDeleting
             ? const SizedBox(
                 width: 24,
@@ -269,15 +295,20 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 ),
-                enabledBorder: OutlineInputBorder( // Border saat aktif tapi tidak fokus
+                enabledBorder: OutlineInputBorder(
+                  // Border saat aktif tapi tidak fokus
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.brown[700]!, width: 1),
                 ),
-                focusedBorder: OutlineInputBorder( // Border saat fokus
+                focusedBorder: OutlineInputBorder(
+                  // Border saat fokus
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.brown[300]!, width: 2),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
               ),
               style: const TextStyle(color: Colors.white),
               cursorColor: Colors.white,
@@ -303,12 +334,18 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                 items: [
                   const DropdownMenuItem(
                     value: null, // Nilai null untuk "Semua Kategori"
-                    child: Text('Kategori', style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      'Kategori',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   ..._categories.map((String category) {
                     return DropdownMenuItem<String>(
                       value: category,
-                      child: Text(category, style: const TextStyle(color: Colors.white)),
+                      child: Text(
+                        category,
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     );
                   }),
                 ],
@@ -327,8 +364,12 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
   }
 
   // WIDGET BUILDER UNTUK STATISTIK (Dinamis, menerima daftar item)
-  Widget _buildStatsWidget() { // Diubah nama dari _buildStats
-    int totalStock = _filteredItems.fold<int>(0, (sum, item) => sum + item.stock);
+  Widget _buildStatsWidget() {
+    // Diubah nama dari _buildStats
+    int totalStock = _filteredItems.fold<int>(
+      0,
+      (sum, item) => sum + item.stock,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
@@ -340,8 +381,16 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatColumn('Total Barang', _filteredItems.length.toString(), Icons.inventory_2),
-              _buildStatColumn('Stok Total', totalStock.toString(), Icons.storage),
+              _buildStatColumn(
+                'Total Barang',
+                _filteredItems.length.toString(),
+                Icons.inventory_2,
+              ),
+              _buildStatColumn(
+                'Stok Total',
+                totalStock.toString(),
+                Icons.storage,
+              ),
             ],
           ),
         ),
@@ -354,9 +403,19 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       children: [
         Icon(icon, color: Colors.white, size: 24),
         const SizedBox(height: 4),
-        Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(
+          title,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
         const SizedBox(height: 2),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }
@@ -367,7 +426,12 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       stream: _warehouseItemsStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+          return Center(
+            child: Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -377,10 +441,10 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
         _allItemsFromFirestore = snapshot.data!.docs
             .map((doc) => WarehouseItem.fromFirestore(doc))
             .toList();
-        
+
         // Panggil _applyFilter di sini untuk memperbarui _filteredItems
         // karena _allItemsFromFirestore baru saja diperbarui
-        _applyFilter(); 
+        _applyFilter();
 
         if (_filteredItems.isEmpty) {
           return const Center(
@@ -392,11 +456,11 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           );
         }
 
-        return Column( 
+        return Column(
           children: [
             _buildStatsWidget(),
             _buildTableHeader(),
-            Expanded( 
+            Expanded(
               child: ListView.builder(
                 itemCount: _filteredItems.length,
                 itemBuilder: (context, index) {
@@ -429,7 +493,10 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10), // Padding disesuaikan
+      padding: const EdgeInsets.symmetric(
+        vertical: 12,
+        horizontal: 10,
+      ), // Padding disesuaikan
       child: const Row(
         children: [
           Expanded(
@@ -497,13 +564,21 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
 
   // WIDGET BUILDER UNTUK BARIS TABEL
   Widget _buildTableRow(WarehouseItem item) {
-    return Card( // Menggunakan Card untuk setiap baris untuk efek elevated
+    return Card(
+      // Menggunakan Card untuk setiap baris untuk efek elevated
       margin: const EdgeInsets.only(bottom: 1), // Margin kecil antar card
       elevation: 1, // Elevasi kecil
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)), // Hilangkan border radius
-      color: Colors.brown[800]?.withOpacity(0.7), // Warna yang sedikit transparan
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0),
+      ), // Hilangkan border radius
+      color: Colors.brown[800]?.withOpacity(
+        0.7,
+      ), // Warna yang sedikit transparan
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10), // Padding disesuaikan
+        padding: const EdgeInsets.symmetric(
+          vertical: 8.0,
+          horizontal: 10,
+        ), // Padding disesuaikan
         child: Row(
           children: [
             Expanded(
@@ -516,13 +591,16 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
             ),
             Expanded(
               flex: 2,
-              child: Text(item.category, style: const TextStyle(color: Colors.white, fontSize: 14)),
+              child: Text(
+                item.category,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
             ),
             Expanded(
               flex: 2,
               child: Text(
                 'Rp${item.price.toStringAsFixed(0)}',
-                textAlign: TextAlign.right, 
+                textAlign: TextAlign.right,
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
@@ -530,23 +608,43 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
               flex: 1,
               child: Text(
                 item.stock.toString(),
-                textAlign: TextAlign.right, 
-                style: TextStyle(color: item.stock < 10 ? Colors.redAccent : Colors.white, fontWeight: item.stock < 10 ? FontWeight.bold : FontWeight.normal, fontSize: 14), // Sorot stok rendah
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: item.stock < 10 ? Colors.redAccent : Colors.white,
+                  fontWeight: item.stock < 10
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  fontSize: 14,
+                ), // Sorot stok rendah
               ),
             ),
             Expanded(
               flex: 2,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, 
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.edit, color: Colors.blue[300], size: 20), // Warna lebih cerah
-                    onPressed: _isSavingOrDeleting ? null : () => _showItemDialog(item: item),
+                    icon: Icon(
+                      Icons.edit,
+                      color: Colors.blue[300],
+                      size: 20,
+                    ), // Warna lebih cerah
+                    onPressed: _isSavingOrDeleting
+                        ? null
+                        : () => _showItemDialog(item: item),
                     tooltip: 'Edit Barang',
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red[300], size: 20), // Warna lebih cerah
-                    onPressed: _isSavingOrDeleting ? null : () => _confirmDeleteItem(item), // Panggil konfirmasi hapus
+                    icon: Icon(
+                      Icons.delete,
+                      color: Colors.red[300],
+                      size: 20,
+                    ), // Warna lebih cerah
+                    onPressed: _isSavingOrDeleting
+                        ? null
+                        : () => _confirmDeleteItem(
+                            item,
+                          ), // Panggil konfirmasi hapus
                     tooltip: 'Hapus Barang',
                   ),
                 ],
@@ -565,10 +663,15 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.brown[800],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
           title: Text(
             'Hapus ${item.name}?',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           content: Text(
             'Apakah Anda yakin ingin menghapus barang ini secara permanen dari warehouse?',
@@ -580,7 +683,9 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
               child: const Text('Batal', style: TextStyle(color: Colors.white)),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red[600]), // Warna tombol hapus lebih gelap
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[600],
+              ), // Warna tombol hapus lebih gelap
               onPressed: () {
                 _deleteItemFromFirestore(item);
                 Navigator.pop(context);
@@ -599,10 +704,16 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
     bool isEditing = item != null;
 
     final nameController = TextEditingController(text: item?.name ?? '');
-    final priceController = TextEditingController(text: item?.price.toStringAsFixed(0) ?? '');
-    final stockController = TextEditingController(text: item?.stock.toString() ?? '');
+    final priceController = TextEditingController(
+      text: item?.price.toStringAsFixed(0) ?? '',
+    );
+    final stockController = TextEditingController(
+      text: item?.stock.toString() ?? '',
+    );
     String selectedCategory = item?.category ?? _categories.first;
-    String imageUrl = item?.image ?? 'https://i.imgur.com/Jc1mR5X.png'; // Default placeholder jika tidak ada
+    String imageUrl =
+        item?.image ??
+        'https://i.imgur.com/Jc1mR5X.png'; // Default placeholder jika tidak ada
 
     showDialog(
       context: context,
@@ -611,7 +722,9 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
           builder: (context, dialogSetState) {
             return AlertDialog(
               backgroundColor: Colors.brown[800],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
               title: Text(
                 isEditing ? 'Edit Barang' : 'Tambah Barang Baru',
                 style: const TextStyle(
@@ -630,13 +743,22 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                         decoration: InputDecoration(
                           labelText: 'Nama Barang',
                           labelStyle: const TextStyle(color: Colors.white70),
-                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[700]!)),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[300]!)),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          fillColor: Colors.brown[700]?.withOpacity(0.5), filled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[700]!),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[300]!),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          fillColor: Colors.brown[700]?.withOpacity(0.5),
+                          filled: true,
                         ),
                         style: const TextStyle(color: Colors.white),
-                        validator: (value) => value == null || value.isEmpty ? 'Nama tidak boleh kosong' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Nama tidak boleh kosong'
+                            : null,
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
@@ -644,20 +766,31 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                         decoration: InputDecoration(
                           labelText: 'Kategori',
                           labelStyle: const TextStyle(color: Colors.white70),
-                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[700]!)),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[300]!)),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          fillColor: Colors.brown[700]?.withOpacity(0.5), filled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[700]!),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[300]!),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          fillColor: Colors.brown[700]?.withOpacity(0.5),
+                          filled: true,
                         ),
                         dropdownColor: Colors.brown[700],
                         iconEnabledColor: Colors.white,
                         items: _categories.map((String category) {
                           return DropdownMenuItem<String>(
                             value: category,
-                            child: Text(category, style: const TextStyle(color: Colors.white)),
+                            child: Text(
+                              category,
+                              style: const TextStyle(color: Colors.white),
+                            ),
                           );
                         }).toList(),
-                        onChanged: (value) => dialogSetState(() => selectedCategory = value!),
+                        onChanged: (value) =>
+                            dialogSetState(() => selectedCategory = value!),
                         style: const TextStyle(color: Colors.white),
                       ),
                       const SizedBox(height: 10),
@@ -666,14 +799,23 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                         decoration: InputDecoration(
                           labelText: 'Harga',
                           labelStyle: const TextStyle(color: Colors.white70),
-                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[700]!)),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[300]!)),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          fillColor: Colors.brown[700]?.withOpacity(0.5), filled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[700]!),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[300]!),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          fillColor: Colors.brown[700]?.withOpacity(0.5),
+                          filled: true,
                         ),
                         style: const TextStyle(color: Colors.white),
                         keyboardType: TextInputType.number,
-                        validator: (value) => value == null || value.isEmpty ? 'Harga tidak boleh kosong' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Harga tidak boleh kosong'
+                            : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
@@ -681,14 +823,23 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
                         decoration: InputDecoration(
                           labelText: 'Stok',
                           labelStyle: const TextStyle(color: Colors.white70),
-                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[700]!)),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.brown[300]!)),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          fillColor: Colors.brown[700]?.withOpacity(0.5), filled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[700]!),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.brown[300]!),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          fillColor: Colors.brown[700]?.withOpacity(0.5),
+                          filled: true,
                         ),
                         style: const TextStyle(color: Colors.white),
                         keyboardType: TextInputType.number,
-                        validator: (value) => value == null || value.isEmpty ? 'Stok tidak boleh kosong' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Stok tidak boleh kosong'
+                            : null,
                       ),
                     ],
                   ),
@@ -696,41 +847,55 @@ class _WarehouseMenuPageState extends State<WarehouseMenuPage> {
               ),
               actions: [
                 TextButton(
-                  onPressed: _isSavingOrDeleting ? null : () => Navigator.pop(context),
-                  child: const Text('Batal', style: TextStyle(color: Colors.white)),
+                  onPressed: _isSavingOrDeleting
+                      ? null
+                      : () => Navigator.pop(context),
+                  child: const Text(
+                    'Batal',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[600],
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  onPressed: _isSavingOrDeleting ? null : () async {
-                    if (_formKey.currentState!.validate()) {
-                      final newItem = WarehouseItem(
-                        id: item?.id ?? '', // Gunakan ID yang ada jika edit, kosong jika baru
-                        name: nameController.text,
-                        category: selectedCategory,
-                        price: double.tryParse(priceController.text) ?? 0,
-                        stock: int.tryParse(stockController.text) ?? 0,
-                        image: imageUrl, // Sementara menggunakan URL yang sudah ada/placeholder
-                      );
+                  onPressed: _isSavingOrDeleting
+                      ? null
+                      : () async {
+                          if (_formKey.currentState!.validate()) {
+                            final newItem = WarehouseItem(
+                              id:
+                                  item?.id ??
+                                  '', // Gunakan ID yang ada jika edit, kosong jika baru
+                              name: nameController.text,
+                              category: selectedCategory,
+                              price: double.tryParse(priceController.text) ?? 0,
+                              stock: int.tryParse(stockController.text) ?? 0,
+                              image:
+                                  imageUrl, // Sementara menggunakan URL yang sudah ada/placeholder
+                            );
 
-                      if (isEditing) {
-                        await _updateItemInFirestore(newItem);
-                      } else {
-                        await _addItemToFirestore(newItem);
-                      }
-                      Navigator.pop(context);
-                    }
-                  },
+                            if (isEditing) {
+                              await _updateItemInFirestore(newItem);
+                            } else {
+                              await _addItemToFirestore(newItem);
+                            }
+                            Navigator.pop(context);
+                          }
+                        },
                   child: _isSavingOrDeleting
                       ? const SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(isEditing ? 'Update' : 'Tambah'),

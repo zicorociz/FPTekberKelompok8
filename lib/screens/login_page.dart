@@ -4,7 +4,6 @@ import 'home_screen.dart';
 import 'signup_page.dart';
 import '../global.dart'; // path relatif dari screens ke global
 
-
 const String backgroundImagePath = 'assets/images/background.png';
 
 class LoginPage extends StatefulWidget {
@@ -20,7 +19,9 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim().toLowerCase();
     final password = _passwordController.text;
 
-    final emailValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    final emailValid = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(email);
 
     if (email.isEmpty || password.isEmpty) {
       _showError('Email dan password wajib diisi.');
@@ -82,11 +83,16 @@ class _LoginPageState extends State<LoginPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(
+        title: Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(backgroundImagePath), // FIX: Ganti NetworkImage ke AssetImage
+            image: AssetImage(
+              backgroundImagePath,
+            ), // FIX: Ganti NetworkImage ke AssetImage
             fit: BoxFit.cover,
           ),
         ),

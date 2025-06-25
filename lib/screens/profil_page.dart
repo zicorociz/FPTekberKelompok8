@@ -23,10 +23,10 @@ class _ProfilPageState extends State<ProfilPage> {
 
   Future<void> _loadProfile() async {
     print("Email user login: $currentUserEmail"); // Tambahkan ini
-  if (currentUserEmail == null) {
-    print("Email NULL, keluar dari loadProfile");
-    return;
-  }
+    if (currentUserEmail == null) {
+      print("Email NULL, keluar dari loadProfile");
+      return;
+    }
 
     try {
       final doc = await FirebaseFirestore.instance
@@ -34,29 +34,29 @@ class _ProfilPageState extends State<ProfilPage> {
           .doc(currentUserEmail)
           .get();
 
-        if (doc.exists) {
-          final data = doc.data()!;
-          setState(() {
-            nama = data['nama'] ?? '';
-            alamat = data['alamat'] ?? '';
-            email = data['email'] ?? currentUserEmail!;
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-          _showMessage('Data profil tidak ditemukan');
-        }
-      } catch (e) {
-        print('Gagal mengambil data profil: $e');
-        _showMessage('Terjadi kesalahan saat memuat profil.');
-
+      if (doc.exists) {
+        final data = doc.data()!;
         setState(() {
-          isLoading = false; // Tambahkan ini agar loading berhenti
+          nama = data['nama'] ?? '';
+          alamat = data['alamat'] ?? '';
+          email = data['email'] ?? currentUserEmail!;
+          isLoading = false;
         });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        _showMessage('Data profil tidak ditemukan');
       }
+    } catch (e) {
+      print('Gagal mengambil data profil: $e');
+      _showMessage('Terjadi kesalahan saat memuat profil.');
+
+      setState(() {
+        isLoading = false; // Tambahkan ini agar loading berhenti
+      });
     }
+  }
 
   Future<void> _updateProfile() async {
     if (currentUserEmail == null) return;
@@ -67,10 +67,7 @@ class _ProfilPageState extends State<ProfilPage> {
           .collection('signup')
           .doc(currentUserEmail);
 
-      await signupRef.update({
-        'nama': nama,
-        'alamat': alamat,
-      });
+      await signupRef.update({'nama': nama, 'alamat': alamat});
 
       // Ambil ulang data lengkap dari signup
       final snapshot = await signupRef.get();
@@ -150,9 +147,9 @@ class _ProfilPageState extends State<ProfilPage> {
 
   void _showMessage(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -161,7 +158,7 @@ class _ProfilPageState extends State<ProfilPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Profil')),
+      appBar: AppBar(title: Text('Profil'), centerTitle: true),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

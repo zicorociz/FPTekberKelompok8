@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 class NotaPage extends StatelessWidget {
   final Map<String, dynamic> pesanan;
   final int totalHarga;
-  static const String backgroundImagePath =
-      'assets/images/background.png';
+  static const String backgroundImagePath = 'assets/images/background.png';
   NotaPage({required this.pesanan, required this.totalHarga});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Nota Pembayaran')),
+      appBar: AppBar(title: Text('Nota Pembayaran'), centerTitle: true),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

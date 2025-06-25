@@ -4,7 +4,8 @@ import 'pembayaran_page.dart';
 
 class PesananMasukPage extends StatefulWidget {
   final List<Map<String, dynamic>> currentOrders;
-  const PesananMasukPage({Key? key, required this.currentOrders}) : super(key: key);
+  const PesananMasukPage({Key? key, required this.currentOrders})
+    : super(key: key);
 
   @override
   _PesananMasukPageState createState() => _PesananMasukPageState();
@@ -20,12 +21,16 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
         title: const Text('Pesanan Masuk'),
         backgroundColor: Colors.brown[800],
         foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-        .collection('pesanan')
-        .orderBy('tanggalPesan', descending: true) // Urutkan berdasarkan tanggal pesan terbaru
-        .snapshots(),
+            .collection('pesanan')
+            .orderBy(
+              'tanggalPesan',
+              descending: true,
+            ) // Urutkan berdasarkan tanggal pesan terbaru
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -57,7 +62,9 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
               final tanggalStr = data['tanggalPesan']?.toString() ?? '';
               final items = (data['items'] as List?) ?? [];
               final totalHarga = data['totalHarga'] ?? 0;
-              final status = data['status'] ?? 'Baru'; // fallback jika tidak ada field status
+              final status =
+                  data['status'] ??
+                  'Baru'; // fallback jika tidak ada field status
               final isOrderCompleted = status == 'Selesai';
 
               // Format tanggal
@@ -70,7 +77,9 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                 }
               }
 
-              final buttonColor = isOrderCompleted ? Colors.grey[600]! : Colors.green[800]!;
+              final buttonColor = isOrderCompleted
+                  ? Colors.grey[600]!
+                  : Colors.green[800]!;
 
               final onPressedCallback = isOrderCompleted
                   ? null
@@ -93,9 +102,14 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                     };
 
               return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                margin: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 4.0,
+                ),
                 elevation: 6,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 color: Colors.brown[700]?.withOpacity(0.9),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -119,13 +133,16 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                           ),
                           const SizedBox(width: 10),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: status == 'Baru'
                                   ? Colors.green[600]
                                   : status == 'Diproses'
-                                      ? Colors.orange[600]
-                                      : Colors.blue[600],
+                                  ? Colors.orange[600]
+                                  : Colors.blue[600],
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -135,8 +152,8 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                                   status == 'Baru'
                                       ? Icons.fiber_new
                                       : status == 'Diproses'
-                                          ? Icons.settings
-                                          : Icons.check_circle,
+                                      ? Icons.settings
+                                      : Icons.check_circle,
                                   color: Colors.white,
                                   size: 18,
                                 ),
@@ -155,7 +172,11 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                         ],
                       ),
 
-                      const Divider(height: 20, thickness: 1, color: Colors.white30),
+                      const Divider(
+                        height: 20,
+                        thickness: 1,
+                        color: Colors.white30,
+                      ),
 
                       const Text(
                         'Detail Pesanan:',
@@ -175,7 +196,10 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                             padding: const EdgeInsets.only(bottom: 4.0),
                             child: Text(
                               '• $namaItem (x$jumlah)',
-                              style: const TextStyle(fontSize: 16, color: Colors.white),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           );
                         }).toList(),
@@ -193,7 +217,10 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                             children: [
                               const Text(
                                 'Waktu Pesanan:',
-                                style: TextStyle(fontSize: 13, color: Colors.white60),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white60,
+                                ),
                               ),
                               Text(
                                 formatTanggal(tanggalStr),
@@ -210,7 +237,10 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                             children: [
                               const Text(
                                 'Total Pembayaran:',
-                                style: TextStyle(fontSize: 13, color: Colors.white60),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white60,
+                                ),
                               ),
                               Text(
                                 'Rp${totalHarga.toStringAsFixed(0)}',
@@ -242,9 +272,10 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                           child: const Text(
                             'Proses Pembayaran',
                             style: TextStyle(
-                                fontSize: 17,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
+                              fontSize: 17,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -252,8 +283,7 @@ class _PesananMasukPageState extends State<PesananMasukPage> {
                   ),
                 ),
               );
-            }
-
+            },
           );
         },
       ),

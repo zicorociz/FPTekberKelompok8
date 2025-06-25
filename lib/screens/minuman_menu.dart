@@ -4,7 +4,6 @@ import 'add_menu_page.dart';
 import 'package:intl/intl.dart'; // Penting: Import ini untuk DateFormat
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 // --- MODEL DATA (Tidak ada perubahan) ---
 class OrderItem {
   final String name;
@@ -20,8 +19,8 @@ class OrderItem {
   });
 
   double get priceAsDouble => double.parse(
-        price.replaceAll('Rp', '').replaceAll('.', '').replaceAll(',-', '').trim(),
-      );
+    price.replaceAll('Rp', '').replaceAll('.', '').replaceAll(',-', '').trim(),
+  );
 
   double get totalPrice => quantity * priceAsDouble;
 }
@@ -43,7 +42,6 @@ class MinumanMenuPage extends StatefulWidget {
 
 class _MinumanMenuPageState extends State<MinumanMenuPage> {
   final String backgroundImagePath = 'assets/images/background.png';
-  
 
   // Katalog produk asli (tidak diubah-ubah)
   List<Map<String, dynamic>> _allMenuItems = [];
@@ -127,28 +125,27 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
       }
     });
   }
+
   void _loadMinumanFromFirebase() {
-  FirebaseFirestore.instance
-      .collection('minuman_menu')
-      .snapshots()
-      .listen((snapshot) {
-    setState(() {
-      _allMenuItems = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return {
-          'id': doc.id, // penting untuk edit/hapus nanti
-          'name': data['name'],
-          'description': data['description'],
-          'price': data['price'],
-          'image': data['image'],
-        };
-      }).toList();
+    FirebaseFirestore.instance.collection('minuman_menu').snapshots().listen((
+      snapshot,
+    ) {
+      setState(() {
+        _allMenuItems = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id, // penting untuk edit/hapus nanti
+            'name': data['name'],
+            'description': data['description'],
+            'price': data['price'],
+            'image': data['image'],
+          };
+        }).toList();
 
-      _onSearchChanged(); // update hasil search
+        _onSearchChanged(); // update hasil search
+      });
     });
-  });
-}
-
+  }
 
   // --- BUILD METHOD ---
   @override
@@ -157,10 +154,10 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
     int columns = (width > 1200)
         ? 5
         : (width > 900)
-            ? 4
-            : (width > 600)
-                ? 3
-                : 2;
+        ? 4
+        : (width > 600)
+        ? 3
+        : 2;
 
     return Scaffold(
       appBar: AppBar(
@@ -178,7 +175,10 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
               hintText: 'Cari menu...',
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 10,
+              ),
               // Tambahkan tombol untuk menghapus teks pencarian
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
@@ -207,33 +207,47 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                     cart: _cart,
                     totalOrderPrice: totalOrderPrice,
                     // Callback onConfirm yang sekarang menerima customerName
-                    onConfirm: (List<OrderItem> confirmedCart, double finalPrice, String customerName) {
-                      // Buat format data pesanan yang sesuai untuk PesananMasukPage
-                      final orderItemsNames =
-                          confirmedCart.map((item) => "${item.name} (${item.quantity}x)").toList();
-                      final newOrderId = DateTime.now().millisecondsSinceEpoch;
-                      final newOrder = {
-                        'id': newOrderId,
-                        'nama': customerName, // Gunakan nama dari input form
-                        'pesanan': orderItemsNames,
-                        'waktu': DateFormat('HH:mm a').format(DateTime.now()), // Format waktu lebih spesifik
-                        'status': 'Baru',
-                        'totalHarga': finalPrice, // Tambahkan total harga
-                      };
-                      return newOrder; // Kembalikan data pesanan
-                    },
+                    onConfirm:
+                        (
+                          List<OrderItem> confirmedCart,
+                          double finalPrice,
+                          String customerName,
+                        ) {
+                          // Buat format data pesanan yang sesuai untuk PesananMasukPage
+                          final orderItemsNames = confirmedCart
+                              .map((item) => "${item.name} (${item.quantity}x)")
+                              .toList();
+                          final newOrderId =
+                              DateTime.now().millisecondsSinceEpoch;
+                          final newOrder = {
+                            'id': newOrderId,
+                            'nama':
+                                customerName, // Gunakan nama dari input form
+                            'pesanan': orderItemsNames,
+                            'waktu': DateFormat('HH:mm a').format(
+                              DateTime.now(),
+                            ), // Format waktu lebih spesifik
+                            'status': 'Baru',
+                            'totalHarga': finalPrice, // Tambahkan total harga
+                          };
+                          return newOrder; // Kembalikan data pesanan
+                        },
                   ),
                 ),
               );
 
               // Jika ada data pesanan yang dikonfirmasi kembali dari CartPage
-              if (newOrderData != null && newOrderData is Map<String, dynamic>) {
+              if (newOrderData != null &&
+                  newOrderData is Map<String, dynamic>) {
                 setState(() {
-                  _cart.clear(); // Hapus item dari keranjang setelah dikonfirmasi
+                  _cart
+                      .clear(); // Hapus item dari keranjang setelah dikonfirmasi
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Pesanan berhasil dikonfirmasi dan ditambahkan!'),
+                    content: Text(
+                      'Pesanan berhasil dikonfirmasi dan ditambahkan!',
+                    ),
                   ),
                 );
 
@@ -248,9 +262,9 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const AddMenuPage()),
-          );
+          final result = await Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const AddMenuPage()));
 
           if (result != null && result is Map<String, dynamic>) {
             try {
@@ -329,7 +343,8 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                       final quantityInCart = _getQuantityInCart(item);
 
                       Widget imageWidget;
-                      if (item['image'] is String && item['image'].startsWith('assets/')) {
+                      if (item['image'] is String &&
+                          item['image'].startsWith('assets/')) {
                         imageWidget = CircleAvatar(
                           radius: 40,
                           backgroundImage: AssetImage(item['image']),
@@ -355,7 +370,9 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                           side: BorderSide(
-                            color: quantityInCart > 0 ? Colors.brown.shade400 : Colors.transparent,
+                            color: quantityInCart > 0
+                                ? Colors.brown.shade400
+                                : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -409,7 +426,9 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                                           Icons.remove_circle,
                                           color: Colors.red,
                                         ),
-                                        onPressed: quantityInCart > 0 ? () => _updateQuantity(item, -1) : null,
+                                        onPressed: quantityInCart > 0
+                                            ? () => _updateQuantity(item, -1)
+                                            : null,
                                       ),
                                       Text(
                                         '$quantityInCart',
@@ -423,7 +442,8 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
                                           Icons.add_circle,
                                           color: Colors.green,
                                         ),
-                                        onPressed: () => _updateQuantity(item, 1),
+                                        onPressed: () =>
+                                            _updateQuantity(item, 1),
                                       ),
                                     ],
                                   ),
@@ -440,17 +460,13 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
       ),
     );
   }
+
   void _showMessage(String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),
-      duration: const Duration(seconds: 2),
-    ),
-  );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
+  }
 }
-
-}
-
 
 // typedef CartConfirmationCallback = Map<String, dynamic> Function(
 //     List<OrderItem> confirmedCart, double finalPrice, String customerName);
@@ -613,13 +629,13 @@ class _MinumanMenuPageState extends State<MinumanMenuPage> {
 //   }
 // }
 
-
 // Typedef untuk callback konfirmasi
-typedef CartConfirmationCallback = Map<String, dynamic> Function(
-  List<OrderItem> confirmedCart,
-  double finalPrice,
-  String customerName,
-);
+typedef CartConfirmationCallback =
+    Map<String, dynamic> Function(
+      List<OrderItem> confirmedCart,
+      double finalPrice,
+      String customerName,
+    );
 
 class CartPage extends StatefulWidget {
   final List<OrderItem> cart;
@@ -709,6 +725,7 @@ class _CartPageState extends State<CartPage> {
       appBar: AppBar(
         title: const Text("Keranjang Pesanan"),
         backgroundColor: Colors.brown[800],
+        centerTitle: true,
       ),
       body: widget.cart.isEmpty
           ? Center(
