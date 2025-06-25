@@ -18,6 +18,7 @@ NgopiPay: Aplikasi POS Sederhana sebagai Solusi Kasir Digital
 ## Teknologi yang Digunakan
 
 - **Dart / Flutter**: Untuk pengembangan aplikasi inti (74.1%)
+- **Firebase/Firestore**: Untuk backend dan penyimpanan data secara real-time
 - **HTML**: Untuk tampilan web sederhana
 - **Lainnya**: Berbagai dependensi minor
 
