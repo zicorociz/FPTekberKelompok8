@@ -17,7 +17,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
   Uint8List? _selectedImageBytes;
   final ImagePicker _picker = ImagePicker();
 
-  final Color themeColor = const Color(0xFF6B4226);
+  final Color themeColor = const Color(0xFF3E2723);
   final Color accentColor = const Color.fromRGBO(78, 92, 54, 1);
 
   void _pickImage() async {
@@ -36,9 +36,9 @@ class _AddMenuPageState extends State<AddMenuPage> {
     if (_nameController.text.isEmpty ||
         _priceController.text.isEmpty ||
         _descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harap isi semua kolom.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Harap isi semua kolom.')));
       return;
     }
 
@@ -82,7 +82,7 @@ class _AddMenuPageState extends State<AddMenuPage> {
           SingleChildScrollView(
             padding: const EdgeInsets.all(35),
             child: Card(
-              color: const Color.fromRGBO(226, 224, 213, 1),
+              color: const Color.fromARGB(255, 255, 255, 255),
               elevation: 8,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
