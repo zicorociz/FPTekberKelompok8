@@ -29,6 +29,9 @@ NgopiPay: Aplikasi POS Sederhana sebagai Solusi Kasir Digital
 
 - [Flutter SDK](https://flutter.dev/docs/get-started/install)
 - [Git](https://git-scm.com/)
+- **[Android Emulator](https://developer.android.com/studio/run/emulator) (opsional untuk testing Android)**
+- **[Android Emulator Extension for Chrome](https://chrome.google.com/webstore/detail/android-emulator/jjndjgheafjngoipoacpjgeicjeomjli) (opsional, untuk menjalankan emulator Android langsung di Chrome)**
+    - Extension ini memungkinkan Anda menjalankan dan menguji aplikasi Android langsung di browser Chrome, tanpa perlu Android Studio.
 
 ### Langkah Instalasi
 
@@ -48,7 +51,25 @@ NgopiPay: Aplikasi POS Sederhana sebagai Solusi Kasir Digital
     flutter run
     ```
 
-Aplikasi dapat dijalankan pada emulator Android/iOS atau langsung pada perangkat fisik.
+    **Catatan Mendetail:**
+    - Jika Anda ingin menjalankan aplikasi di Chrome (web), pastikan ekstensi [Android Emulator Extension for Chrome](https://chrome.google.com/webstore/detail/android-emulator/jjndjgheafjngoipoacpjgeicjeomjli) sudah terpasang (jika ingin testing Android di browser).
+    - Setelah menjalankan `flutter run`, akan muncul daftar device yang tersedia. Misalnya:
+      ```
+      1. Chrome (web)
+      2. Edge (web)
+      3. Android emulator
+      4. iOS simulator
+      q. Quit (terminate the app)
+      ```
+    - **Pilih angka sesuai device yang diinginkan**, misalnya `1` untuk Chrome, atau `3` untuk Android Emulator.
+        - Untuk memilih Chrome, ketik `1` lalu tekan `Enter`.
+        - Untuk menjalankan di Android Emulator Extension (Chrome), pastikan sudah mengaktifkan extension, lalu pilih device Android Emulator yang muncul pada daftar.
+    - Jika ingin menjalankan di perangkat fisik, pastikan perangkat sudah terhubung via USB dan USB debugging sudah aktif.
+    - Untuk menjalankan di Android Emulator Extension, pastikan:
+        - Chrome sudah terpasang extension Android Emulator.
+        - Pilih device Android Emulator yang tersedia pada daftar device setelah `flutter run`.
+
+Aplikasi dapat dijalankan pada emulator Android/iOS, browser (Chrome/Edge), atau langsung pada perangkat fisik.
 
 ## Kontribusi
 
