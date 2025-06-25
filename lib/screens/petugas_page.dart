@@ -152,11 +152,6 @@ class _PetugasPageState extends State<PetugasPage> {
     });
 
     try {
-      final String appId = const String.fromEnvironment(
-        'FLUTTER_APP_ID',
-        defaultValue: 'default-app-id',
-      );
-
       int newId = 0;
       final QuerySnapshot currentDocs = await FirebaseFirestore.instance
           .collection('pegawai')
@@ -242,10 +237,6 @@ class _PetugasPageState extends State<PetugasPage> {
 
   // Fungsi untuk menghapus pegawai dari Firestore dan Storage
   Future<void> _deletePegawai(String docId, String? fotoUrl) async {
-    final String appId = const String.fromEnvironment(
-      'FLUTTER_APP_ID',
-      defaultValue: 'default-app-id',
-    );
     try {
       await FirebaseFirestore.instance
           .collection('pegawai')
@@ -275,10 +266,6 @@ class _PetugasPageState extends State<PetugasPage> {
 
   // Fungsi untuk mengupdate status 'isActive' pegawai di Firestore
   Future<void> _updatePegawaiStatus(String docId, bool newValue) async {
-    final String appId = const String.fromEnvironment(
-      'FLUTTER_APP_ID',
-      defaultValue: 'default-app-id',
-    );
     try {
       await FirebaseFirestore.instance.collection('pegawai').doc(docId).update({
         'isActive': newValue,
